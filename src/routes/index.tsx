@@ -53,8 +53,8 @@ function Login() {
             <Flame size={32} />
           </div>
           <div>
-            <p className="font-display text-2xl font-black leading-none">Flamme</p>
-            <p className="font-display text-2xl font-black leading-none text-primary">Basket</p>
+            <p className="font-display text-2xl font-black leading-none">CTC</p>
+            <p className="font-display text-2xl font-black leading-none text-primary">PVO</p>
           </div>
         </div>
 
