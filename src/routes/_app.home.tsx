@@ -103,7 +103,7 @@ function HomePage() {
         <BigStat label="Présence matchs" value={stats.matchAttendance} suffix="%" />
         <FatigueCard value={stats.avgFatigue} />
         <div className="rounded-3xl bg-secondary p-4 text-secondary-foreground shadow-card">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/50">Flamme</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-white/50">CTC</p>
           <p className="mt-2 text-3xl font-black">{player.flamme_actuelle}<span className="text-lg text-white/60">j</span></p>
           <p className="mt-1 text-xs text-white/60">consécutifs 🔥</p>
         </div>
