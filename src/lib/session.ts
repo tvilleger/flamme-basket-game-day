@@ -1,8 +1,8 @@
-import { players, type Player } from "./mock-data";
+import { findJoueuse, type Joueuse } from "./api";
 
 const KEY = "flamme-session";
 
-export type Session = { firstName: string; birthDate: string };
+export type Session = { joueuseId: string; prenom: string };
 
 export function saveSession(s: Session) {
   if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(s));
@@ -15,10 +15,7 @@ export function getSession(): Session | null {
 export function clearSession() {
   if (typeof window !== "undefined") localStorage.removeItem(KEY);
 }
-export function findPlayer(s: Session | null): Player | null {
-  if (!s) return null;
-  const match = players.find(
-    (p) => p.firstName.toLowerCase() === s.firstName.toLowerCase() && p.birthDate === s.birthDate,
-  );
-  return match ?? players[0]; // demo fallback
+
+export async function attemptLogin(prenom: string, dateNaissance: string): Promise<Joueuse | null> {
+  return findJoueuse(prenom, dateNaissance);
 }
