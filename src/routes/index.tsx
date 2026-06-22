@@ -6,8 +6,8 @@ import { attemptLogin, saveSession } from "@/lib/session";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Flamme Basket — Connexion" },
-      { name: "description", content: "L'app de l'équipe féminine Flamme Basket." },
+      { title: "CTC PVO — Connexion" },
+      { name: "description", content: "L'app de l'équipe féminine CTC PVO." },
       { name: "theme-color", content: "#FF6A1F" },
     ],
   }),
