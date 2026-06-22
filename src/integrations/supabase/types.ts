@@ -14,7 +14,198 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      entrainements: {
+        Row: {
+          created_at: string
+          date: string
+          equipe: string
+          heure: string
+          id: string
+          lieu: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          equipe?: string
+          heure: string
+          id?: string
+          lieu?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          equipe?: string
+          heure?: string
+          id?: string
+          lieu?: string | null
+        }
+        Relationships: []
+      }
+      joueuses: {
+        Row: {
+          created_at: string
+          date_naissance: string
+          equipe: string
+          flamme_actuelle: number
+          id: string
+          photo: string | null
+          prenom: string
+          record_flamme: number
+          statut_blessure: string
+        }
+        Insert: {
+          created_at?: string
+          date_naissance: string
+          equipe?: string
+          flamme_actuelle?: number
+          id?: string
+          photo?: string | null
+          prenom: string
+          record_flamme?: number
+          statut_blessure?: string
+        }
+        Update: {
+          created_at?: string
+          date_naissance?: string
+          equipe?: string
+          flamme_actuelle?: number
+          id?: string
+          photo?: string | null
+          prenom?: string
+          record_flamme?: number
+          statut_blessure?: string
+        }
+        Relationships: []
+      }
+      matchs: {
+        Row: {
+          adversaire: string
+          created_at: string
+          date: string
+          heure: string
+          id: string
+          lieu: string
+        }
+        Insert: {
+          adversaire: string
+          created_at?: string
+          date: string
+          heure: string
+          id?: string
+          lieu?: string
+        }
+        Update: {
+          adversaire?: string
+          created_at?: string
+          date?: string
+          heure?: string
+          id?: string
+          lieu?: string
+        }
+        Relationships: []
+      }
+      messages_coach: {
+        Row: {
+          contenu: string
+          date_publication: string
+          id: string
+          titre: string | null
+        }
+        Insert: {
+          contenu: string
+          date_publication?: string
+          id?: string
+          titre?: string | null
+        }
+        Update: {
+          contenu?: string
+          date_publication?: string
+          id?: string
+          titre?: string | null
+        }
+        Relationships: []
+      }
+      presences_entrainements: {
+        Row: {
+          date_validation: string
+          entrainement_id: string
+          fatigue: number | null
+          id: string
+          joueuse_id: string
+          presente: boolean
+        }
+        Insert: {
+          date_validation?: string
+          entrainement_id: string
+          fatigue?: number | null
+          id?: string
+          joueuse_id: string
+          presente?: boolean
+        }
+        Update: {
+          date_validation?: string
+          entrainement_id?: string
+          fatigue?: number | null
+          id?: string
+          joueuse_id?: string
+          presente?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presences_entrainements_entrainement_id_fkey"
+            columns: ["entrainement_id"]
+            isOneToOne: false
+            referencedRelation: "entrainements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presences_entrainements_joueuse_id_fkey"
+            columns: ["joueuse_id"]
+            isOneToOne: false
+            referencedRelation: "joueuses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      presences_matchs: {
+        Row: {
+          created_at: string
+          id: string
+          joueuse_id: string
+          match_id: string
+          presente: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          joueuse_id: string
+          match_id: string
+          presente?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          joueuse_id?: string
+          match_id?: string
+          presente?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presences_matchs_joueuse_id_fkey"
+            columns: ["joueuse_id"]
+            isOneToOne: false
+            referencedRelation: "joueuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "presences_matchs_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matchs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
