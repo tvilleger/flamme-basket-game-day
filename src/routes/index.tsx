@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Flame } from "@/components/Flame";
-import { saveSession } from "@/lib/session";
+import { attemptLogin, saveSession } from "@/lib/session";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -18,16 +18,32 @@ function Login() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("Léa");
   const [birthDate, setBirthDate] = useState("2008-04-12");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName || !birthDate) return;
-    saveSession({ firstName, birthDate });
-    navigate({ to: "/home" });
+    setLoading(true);
+    setError(null);
+    try {
+      const joueuse = await attemptLogin(firstName.trim(), birthDate);
+      if (!joueuse) {
+        setError("Aucune joueuse trouvée avec ce prénom et cette date.");
+        return;
+      }
+      saveSession({ joueuseId: joueuse.id, prenom: joueuse.prenom });
+      navigate({ to: "/home" });
+    } catch (err) {
+      console.error(err);
+      setError("Connexion impossible. Réessaie dans un instant.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="relative mx-auto flex min-h-screen max-w-md flex-col bg-gradient-ink px-6 pb-10 pt-16 text-white overflow-hidden">
+    <div className="relative mx-auto flex min-h-screen max-w-md flex-col overflow-hidden bg-gradient-ink px-6 pb-10 pt-16 text-white">
       <div className="pointer-events-none absolute -top-24 -right-20 h-72 w-72 rounded-full bg-gradient-flame opacity-30 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-gradient-flame opacity-20 blur-3xl" />
 
@@ -75,15 +91,22 @@ function Login() {
             />
           </label>
 
+          {error && (
+            <p className="rounded-xl bg-destructive/20 px-4 py-3 text-sm font-semibold text-white">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
-            className="mt-4 rounded-2xl bg-gradient-flame px-6 py-4 text-lg font-black text-primary-foreground shadow-flame transition-transform active:scale-[0.98]"
+            disabled={loading}
+            className="mt-4 rounded-2xl bg-gradient-flame px-6 py-4 text-lg font-black text-primary-foreground shadow-flame transition-transform active:scale-[0.98] disabled:opacity-60"
           >
-            Entrer dans le vestiaire →
+            {loading ? "Connexion..." : "Entrer dans le vestiaire →"}
           </button>
 
           <p className="mt-2 text-center text-xs text-white/40">
-            Données de démo · essaye Léa / 12 avril 2008
+            Démo : Léa · 12/04/2008
           </p>
         </form>
       </div>

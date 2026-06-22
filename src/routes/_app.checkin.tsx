@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Sparkles } from "lucide-react";
-import { upcoming } from "@/lib/mock-data";
+import { fetchNextEntrainement, formatFrDate, submitCheckin } from "@/lib/api";
+import { getSession } from "@/lib/session";
 
 export const Route = createFileRoute("/_app/checkin")({
   component: CheckinPage,
@@ -11,16 +13,29 @@ const fatigueLabels = ["", "Au top", "Bien", "Moyen", "Crevée", "Épuisée"];
 const fatigueEmojis = ["", "😎", "💪", "😐", "😴", "🥵"];
 
 function CheckinPage() {
+  const session = getSession();
+  const qc = useQueryClient();
+  const trainingQ = useQuery({ queryKey: ["next-training"], queryFn: fetchNextEntrainement });
   const [presence, setPresence] = useState<"yes" | "no" | null>(null);
   const [fatigue, setFatigue] = useState<number>(0);
   const [done, setDone] = useState(false);
 
-  const canSubmit = presence !== null && (presence === "no" || fatigue > 0);
+  const mutation = useMutation({
+    mutationFn: () =>
+      submitCheckin({
+        joueuseId: session!.joueuseId,
+        entrainementId: trainingQ.data!.id,
+        presente: presence === "yes",
+        fatigue: presence === "yes" ? fatigue : null,
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["stats", session?.joueuseId] });
+      setDone(true);
+    },
+  });
 
-  const submit = () => {
-    if (!canSubmit) return;
-    setDone(true);
-  };
+  const canSubmit =
+    !!trainingQ.data && presence !== null && (presence === "no" || fatigue > 0) && !mutation.isPending;
 
   if (done) {
     return (
@@ -29,7 +44,7 @@ function CheckinPage() {
           <Check size={48} className="text-primary-foreground" strokeWidth={3} />
         </div>
         <h1 className="mt-6 text-3xl font-black">Check-in validé !</h1>
-        <p className="mt-2 text-muted-foreground">Ta flamme grandit 🔥 +1 jour</p>
+        <p className="mt-2 text-muted-foreground">Ta réponse a été enregistrée 🔥</p>
         <button
           onClick={() => { setDone(false); setPresence(null); setFatigue(0); }}
           className="mt-8 rounded-2xl bg-secondary px-6 py-3 font-bold text-secondary-foreground"
@@ -40,24 +55,30 @@ function CheckinPage() {
     );
   }
 
+  const training = trainingQ.data;
+
   return (
     <div className="px-5 pt-8">
       <header>
         <p className="text-xs font-bold uppercase tracking-wider text-primary">Check-in</p>
         <h1 className="mt-1 text-3xl font-black">Entraînement</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {upcoming.training.date} · {upcoming.training.time}
-        </p>
+        {training ? (
+          <p className="mt-1 text-sm text-muted-foreground">
+            {formatFrDate(training.date)} · {training.heure.slice(0, 5)}
+            {training.lieu ? ` · ${training.lieu}` : ""}
+          </p>
+        ) : (
+          <p className="mt-1 text-sm text-muted-foreground">Aucun entraînement à venir.</p>
+        )}
       </header>
 
       <section className="mt-6">
-        <h2 className="mb-3 text-sm font-black uppercase tracking-wider text-muted-foreground">
-          Tu seras là ?
-        </h2>
+        <h2 className="mb-3 text-sm font-black uppercase tracking-wider text-muted-foreground">Tu seras là ?</h2>
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => setPresence("yes")}
-            className={`rounded-3xl border-2 p-5 text-left transition-all ${
+            disabled={!training}
+            className={`rounded-3xl border-2 p-5 text-left transition-all disabled:opacity-50 ${
               presence === "yes"
                 ? "border-transparent bg-gradient-flame text-primary-foreground shadow-flame scale-[1.02]"
                 : "border-border bg-card"
@@ -68,7 +89,8 @@ function CheckinPage() {
           </button>
           <button
             onClick={() => setPresence("no")}
-            className={`rounded-3xl border-2 p-5 text-left transition-all ${
+            disabled={!training}
+            className={`rounded-3xl border-2 p-5 text-left transition-all disabled:opacity-50 ${
               presence === "no"
                 ? "border-secondary bg-secondary text-secondary-foreground scale-[1.02]"
                 : "border-border bg-card"
@@ -112,13 +134,19 @@ function CheckinPage() {
         </section>
       )}
 
+      {mutation.isError && (
+        <p className="mt-4 rounded-xl bg-destructive/15 px-4 py-3 text-sm text-destructive">
+          Erreur d'enregistrement. Réessaie.
+        </p>
+      )}
+
       <button
-        onClick={submit}
+        onClick={() => mutation.mutate()}
         disabled={!canSubmit}
         className="mt-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-flame px-6 py-4 text-lg font-black text-primary-foreground shadow-flame transition-transform active:scale-[0.98] disabled:opacity-40 disabled:shadow-none"
       >
         <Sparkles size={20} />
-        Valider mon check-in
+        {mutation.isPending ? "Envoi..." : "Valider mon check-in"}
       </button>
     </div>
   );

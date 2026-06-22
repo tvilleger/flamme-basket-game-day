@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { players, hallOfFame } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { fetchJoueuses, getAvatar, type Joueuse } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import { Flame } from "@/components/Flame";
 import { Trophy, Medal } from "lucide-react";
 
@@ -17,13 +19,41 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "hof", label: "Hall of Fame" },
 ];
 
+async function fetchAttendanceRanking(kind: "training" | "match") {
+  const table = kind === "training" ? "presences_entrainements" : "presences_matchs";
+  const [{ data: joueuses }, { data: rows }] = await Promise.all([
+    supabase.from("joueuses").select("*"),
+    supabase.from(table).select("joueuse_id, presente"),
+  ]);
+  const map = new Map<string, { total: number; present: number }>();
+  (rows ?? []).forEach((r) => {
+    const m = map.get(r.joueuse_id) ?? { total: 0, present: 0 };
+    m.total += 1;
+    if (r.presente) m.present += 1;
+    map.set(r.joueuse_id, m);
+  });
+  return (joueuses ?? [])
+    .map((j) => {
+      const s = map.get(j.id);
+      const pct = s && s.total ? Math.round((s.present / s.total) * 100) : 0;
+      return { joueuse: j as Joueuse, value: pct };
+    })
+    .sort((a, b) => b.value - a.value);
+}
+
 function RankingsPage() {
   const [tab, setTab] = useState<Tab>("flame");
 
-  const sorted = [...players].sort((a, b) => {
-    if (tab === "training") return b.trainingAttendance - a.trainingAttendance;
-    if (tab === "match") return b.matchAttendance - a.matchAttendance;
-    return b.flame - a.flame;
+  const flameQ = useQuery({ queryKey: ["ranking-flame"], queryFn: fetchJoueuses });
+  const trainingQ = useQuery({
+    queryKey: ["ranking-training"],
+    queryFn: () => fetchAttendanceRanking("training"),
+    enabled: tab === "training",
+  });
+  const matchQ = useQuery({
+    queryKey: ["ranking-match"],
+    queryFn: () => fetchAttendanceRanking("match"),
+    enabled: tab === "match",
   });
 
   return (
@@ -33,17 +63,14 @@ function RankingsPage() {
         <h1 className="mt-1 text-3xl font-black">Qui mène la danse ?</h1>
       </header>
 
-      {/* Tabs */}
-      <div className="mt-5 -mx-5 overflow-x-auto px-5 pb-1">
+      <div className="-mx-5 mt-5 overflow-x-auto px-5 pb-1">
         <div className="flex gap-2">
           {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-black transition-all ${
-                tab === t.id
-                  ? "bg-secondary text-secondary-foreground"
-                  : "bg-muted text-muted-foreground"
+                tab === t.id ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
               }`}
             >
               {t.label}
@@ -53,82 +80,101 @@ function RankingsPage() {
       </div>
 
       {tab === "hof" ? (
-        <section className="mt-5 space-y-3">
-          <div className="rounded-3xl bg-gradient-ink p-5 text-white shadow-card">
-            <div className="flex items-center gap-3">
-              <Trophy size={24} className="text-primary" />
-              <h2 className="text-lg font-black">Hall of Fame des records</h2>
-            </div>
-            <p className="mt-1 text-sm text-white/60">Les flammes les plus longues de la saison</p>
-          </div>
-          {hallOfFame.map((h, i) => (
-            <div
-              key={h.name}
-              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-3xl bg-card p-4 shadow-card animate-slide-up"
-              style={{ animationDelay: `${i * 0.05}s` }}
-            >
-              <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-xl ${
-                i === 0 ? "bg-gradient-flame" : "bg-muted"
-              }`}>
-                {i === 0 ? "👑" : <Medal size={20} />}
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-base font-black">{h.name}</p>
-                <p className="text-xs text-muted-foreground">Saison {h.year}</p>
-              </div>
-              <div className="flex shrink-0 items-center gap-1 rounded-full bg-gradient-flame px-3 py-1.5 text-sm font-black text-primary-foreground">
-                {h.record} <Flame size={14} animate={false} />
-              </div>
-            </div>
-          ))}
-        </section>
+        <HallOfFame players={flameQ.data ?? []} />
+      ) : tab === "flame" ? (
+        <RankingList
+          items={(flameQ.data ?? []).map((j) => ({ joueuse: j, value: j.flamme_actuelle }))}
+          suffix="j 🔥"
+        />
+      ) : tab === "training" ? (
+        <RankingList items={trainingQ.data ?? []} suffix="%" />
       ) : (
-        <section className="mt-5 space-y-3">
-          {sorted.map((p, i) => {
-            const value =
-              tab === "training" ? `${p.trainingAttendance}%` :
-              tab === "match" ? `${p.matchAttendance}%` :
-              `${p.flame}j`;
-            return (
-              <div
-                key={p.id}
-                className={`grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 rounded-3xl p-3 shadow-card animate-slide-up ${
-                  i === 0 ? "bg-gradient-ink text-white" : "bg-card"
-                }`}
-                style={{ animationDelay: `${i * 0.05}s` }}
-              >
-                <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-black ${
-                  i === 0 ? "bg-gradient-flame text-primary-foreground" :
-                  i === 1 ? "bg-secondary text-secondary-foreground" :
-                  i === 2 ? "bg-primary/20 text-primary" :
-                  "bg-muted text-muted-foreground"
-                }`}>
-                  {i + 1}
-                </div>
-                <img
-                  src={p.avatar}
-                  alt={p.firstName}
-                  loading="lazy"
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 shrink-0 rounded-2xl bg-white object-cover"
-                />
-                <div className="min-w-0">
-                  <p className="truncate font-black">{p.firstName}</p>
-                  <p className={`truncate text-xs ${i === 0 ? "text-white/60" : "text-muted-foreground"}`}>
-                    {p.team}
-                  </p>
-                </div>
-                <div className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-black ${
-                  i === 0 ? "bg-gradient-flame text-primary-foreground" : "bg-muted text-foreground"
-                }`}>
-                  {tab === "flame" ? `${value} 🔥` : value}
-                </div>
-              </div>
-            );
-          })}
-        </section>
+        <RankingList items={matchQ.data ?? []} suffix="%" />
       )}
     </div>
+  );
+}
+
+function RankingList({
+  items, suffix,
+}: { items: { joueuse: Joueuse; value: number }[]; suffix: string }) {
+  if (!items.length) {
+    return <p className="mt-8 text-center text-sm text-muted-foreground">Pas encore de données.</p>;
+  }
+  return (
+    <section className="mt-5 space-y-3">
+      {items.map(({ joueuse: p, value }, i) => (
+        <div
+          key={p.id}
+          className={`grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 rounded-3xl p-3 shadow-card animate-slide-up ${
+            i === 0 ? "bg-gradient-ink text-white" : "bg-card"
+          }`}
+          style={{ animationDelay: `${i * 0.05}s` }}
+        >
+          <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-black ${
+            i === 0 ? "bg-gradient-flame text-primary-foreground" :
+            i === 1 ? "bg-secondary text-secondary-foreground" :
+            i === 2 ? "bg-primary/20 text-primary" :
+            "bg-muted text-muted-foreground"
+          }`}>
+            {i + 1}
+          </div>
+          <img
+            src={getAvatar(p.prenom, p.photo)}
+            alt={p.prenom}
+            loading="lazy"
+            width={48}
+            height={48}
+            className="h-12 w-12 shrink-0 rounded-2xl bg-white object-cover"
+          />
+          <div className="min-w-0">
+            <p className="truncate font-black">{p.prenom}</p>
+            <p className={`truncate text-xs ${i === 0 ? "text-white/60" : "text-muted-foreground"}`}>
+              {p.equipe}
+            </p>
+          </div>
+          <div className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-black ${
+            i === 0 ? "bg-gradient-flame text-primary-foreground" : "bg-muted text-foreground"
+          }`}>
+            {value}{suffix}
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function HallOfFame({ players }: { players: Joueuse[] }) {
+  const sorted = [...players].sort((a, b) => b.record_flamme - a.record_flamme);
+  return (
+    <section className="mt-5 space-y-3">
+      <div className="rounded-3xl bg-gradient-ink p-5 text-white shadow-card">
+        <div className="flex items-center gap-3">
+          <Trophy size={24} className="text-primary" />
+          <h2 className="text-lg font-black">Hall of Fame des records</h2>
+        </div>
+        <p className="mt-1 text-sm text-white/60">Les flammes les plus longues</p>
+      </div>
+      {sorted.map((h, i) => (
+        <div
+          key={h.id}
+          className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-3xl bg-card p-4 shadow-card animate-slide-up"
+          style={{ animationDelay: `${i * 0.05}s` }}
+        >
+          <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-xl ${
+            i === 0 ? "bg-gradient-flame" : "bg-muted"
+          }`}>
+            {i === 0 ? "👑" : <Medal size={20} />}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-black">{h.prenom}</p>
+            <p className="text-xs text-muted-foreground">{h.equipe}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-1 rounded-full bg-gradient-flame px-3 py-1.5 text-sm font-black text-primary-foreground">
+            {h.record_flamme} <Flame size={14} animate={false} />
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }

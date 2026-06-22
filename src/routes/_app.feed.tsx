@@ -1,13 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { feed } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
 import { Heart, MessageCircle } from "lucide-react";
+import { coachAvatar, fetchMessages, formatRelative, type Message } from "@/lib/api";
 
 export const Route = createFileRoute("/_app/feed")({
   component: FeedPage,
 });
 
 function FeedPage() {
+  const messagesQ = useQuery({ queryKey: ["messages"], queryFn: fetchMessages });
+
   return (
     <div className="px-5 pt-8">
       <header>
@@ -17,16 +20,22 @@ function FeedPage() {
       </header>
 
       <section className="mt-6 space-y-4">
-        {feed.map((post, i) => (
+        {messagesQ.isLoading && (
+          <p className="text-center text-sm text-muted-foreground">Chargement…</p>
+        )}
+        {(messagesQ.data ?? []).map((post, i) => (
           <PostCard key={post.id} post={post} delay={i * 0.05} />
         ))}
+        {messagesQ.data && messagesQ.data.length === 0 && (
+          <p className="text-center text-sm text-muted-foreground">Pas encore de message.</p>
+        )}
       </section>
     </div>
   );
 }
 
-function PostCard({ post, delay }: { post: (typeof feed)[number]; delay: number }) {
-  const [likes, setLikes] = useState(post.reactions);
+function PostCard({ post, delay }: { post: Message; delay: number }) {
+  const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
 
   const toggle = () => {
@@ -41,24 +50,24 @@ function PostCard({ post, delay }: { post: (typeof feed)[number]; delay: number 
     >
       <div className="flex items-center gap-3 p-4">
         <img
-          src={post.authorAvatar}
-          alt={post.author}
+          src={coachAvatar}
+          alt="Coach"
           loading="lazy"
           width={44}
           height={44}
           className="h-11 w-11 shrink-0 rounded-2xl bg-muted object-cover"
         />
         <div className="min-w-0">
-          <p className="truncate text-sm font-black">{post.author}</p>
-          <p className="text-xs text-muted-foreground">{post.date}</p>
+          <p className="truncate text-sm font-black">Coach Sandra</p>
+          <p className="text-xs text-muted-foreground">{formatRelative(post.date_publication)}</p>
         </div>
         <span className="ml-auto shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-primary">
           Coach
         </span>
       </div>
       <div className="px-4 pb-4">
-        <h2 className="text-lg font-black">{post.title}</h2>
-        <p className="mt-1 text-sm leading-relaxed text-foreground/80">{post.body}</p>
+        {post.titre && <h2 className="text-lg font-black">{post.titre}</h2>}
+        <p className="mt-1 text-sm leading-relaxed text-foreground/80">{post.contenu}</p>
       </div>
       <div className="flex items-center gap-1 border-t border-border px-2 py-1">
         <button
