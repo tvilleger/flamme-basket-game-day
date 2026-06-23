@@ -16,6 +16,6 @@ export function clearSession() {
   if (typeof window !== "undefined") localStorage.removeItem(KEY);
 }
 
-export async function attemptLogin(prenom: string, dateNaissance: string): Promise<Joueuse | null> {
-  return findJoueuse(prenom, dateNaissance);
+export async function attemptLogin(prenom: string, licence: string): Promise<Joueuse | null> {
+  return findJoueuse(prenom, licence);
 }
