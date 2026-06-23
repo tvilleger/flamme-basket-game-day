@@ -119,13 +119,20 @@ function Login() {
           )}
 
           <button
-            type="submit"
-            disabled={loading}
-            className="mt-4 rounded-2xl bg-gradient-flame px-6 py-4 text-lg font-black text-primary-foreground shadow-flame transition-transform active:scale-[0.98] disabled:opacity-60"
-          >
-            {loading ? "Connexion..." : "Entrer dans le vestiaire →"}
-          </button>
+  type="submit"
+  disabled={loading}
+  className="mt-4 rounded-2xl bg-gradient-flame px-6 py-4 text-lg font-black text-primary-foreground shadow-flame transition-transform active:scale-[0.98] disabled:opacity-60"
+>
+  {loading ? "Connexion..." : "Entrer dans le vestiaire →"}
+</button>
 
+<button
+  type="button"
+  onClick={() => navigate({ to: "/coach-login" })}
+  className="mt-3 w-full rounded-2xl border border-white/20 px-6 py-4 text-white"
+>
+  Accès Coach 🏀
+</button>
           <p className="mt-2 text-center text-xs text-white/40">
             Connexion avec prénom + numéro de licence
           </p>
