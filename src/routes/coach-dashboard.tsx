@@ -131,23 +131,27 @@ function CoachDashboard() {
           }
         }
 
-        // Fatigue moyenne > 4
-        const myFatigues = mine
-          .map((p) => p.fatigue)
-          .filter((f): f is number => typeof f === "number");
-        if (myFatigues.length > 0) {
-          const avg = myFatigues.reduce((a, b) => a + b, 0) / myFatigues.length;
-          if (avg >= 3) {
-            alerts.push({
-              joueuseId: j.id,
-              prenom: j.prenom,
-              photo: j.photo,
-              type: "fatigue",
-             detail: `Fatigue élevée (${avg.toFixed(1)}/5)`,
-            });
-          }
-        }
-      }
+        // Fatigue prochain entraînement
+if (nextEntr) {
+  const nextResponse = mine.find(
+    (p) => p.entrainement_id === nextEntr.id
+  );
+
+  if (
+    nextResponse &&
+    nextResponse.presente === true &&
+    nextResponse.fatigue !== null &&
+    nextResponse.fatigue >= 3
+  ) {
+    alerts.push({
+      joueuseId: j.id,
+      prenom: j.prenom,
+      photo: j.photo,
+      type: "fatigue",
+      detail: `Fatigue élevée (${nextResponse.fatigue}/5)`,
+    });
+  }
+}
 
       return {
         effectif,
