@@ -47,8 +47,7 @@ export async function findJoueuse(
   const { data, error } = await supabase
     .from("joueuses")
     .select("*")
-    .ilike("prenom", prenom.trim())
-    .eq("licence", licence.trim());
+    .eq("licence", licence);
 
   if (error) throw error;
 
