@@ -152,7 +152,7 @@ if (nextEntr) {
     });
   }
 }
-
+}
       return {
         effectif,
         actives,
