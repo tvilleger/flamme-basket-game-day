@@ -44,6 +44,8 @@ export async function findJoueuse(
   prenom: string,
   licence: string
 ) {
+  console.log("Recherche :", prenom, licence);
+
   const { data, error } = await supabase
     .from("joueuses")
     .select("*")
@@ -55,7 +57,6 @@ export async function findJoueuse(
 
   return data;
 }
-
 export async function fetchJoueuseById(id: string) {
   const { data, error } = await supabase
     .from("joueuses")
