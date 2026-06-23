@@ -53,6 +53,7 @@ export async function findJoueuse(
 
   return data?.[0] ?? null;
 }
+
 export async function fetchJoueuseById(id: string) {
   const { data, error } = await supabase
     .from("joueuses")
