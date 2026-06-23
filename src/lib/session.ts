@@ -19,3 +19,11 @@ export function clearSession() {
 export async function attemptLogin(prenom: string, licence: string): Promise<Joueuse | null> {
   return findJoueuse(prenom, licence);
 }
+import { findCoach } from "./api";
+
+export async function attemptCoachLogin(
+  nom: string,
+  motDePasse: string
+) {
+  return findCoach(nom, motDePasse);
+}
