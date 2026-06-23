@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
 function Login() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("Léa");
-  const [birthDate, setBirthDate] = useState("2008-04-12");
+  const [licence, setLicence] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +27,7 @@ function Login() {
     setLoading(true);
     setError(null);
     try {
-      const joueuse = await attemptLogin(firstName.trim(), birthDate);
+      const joueuse = await attemptLogin(firstName.trim(), licence.trim());
       if (!joueuse) {
         setError("Aucune joueuse trouvée avec ce prénom et cette date.");
         return;
