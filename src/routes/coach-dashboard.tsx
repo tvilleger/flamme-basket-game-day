@@ -137,7 +137,7 @@ function CoachDashboard() {
           .filter((f): f is number => typeof f === "number");
         if (myFatigues.length > 0) {
           const avg = myFatigues.reduce((a, b) => a + b, 0) / myFatigues.length;
-          if (avg > 3) {
+          if (avg >= 3) {
             alerts.push({
               joueuseId: j.id,
               prenom: j.prenom,
