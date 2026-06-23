@@ -1,3 +1,11 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { Flame } from "@/components/Flame";
+import { attemptLogin, saveSession } from "@/lib/session";
+
+export const Route = createFileRoute("/")({
+  component: Login,
+});
 function Login() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
