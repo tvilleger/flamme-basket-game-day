@@ -62,6 +62,41 @@ export type Database = {
         }
         Relationships: []
       }
+      historique_flammes: {
+        Row: {
+          coach: string | null
+          date: string
+          id: string
+          joueuse_id: string
+          motif: string
+          variation: number
+        }
+        Insert: {
+          coach?: string | null
+          date?: string
+          id?: string
+          joueuse_id: string
+          motif: string
+          variation: number
+        }
+        Update: {
+          coach?: string | null
+          date?: string
+          id?: string
+          joueuse_id?: string
+          motif?: string
+          variation?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historique_flammes_joueuse_id_fkey"
+            columns: ["joueuse_id"]
+            isOneToOne: false
+            referencedRelation: "joueuses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       joueuses: {
         Row: {
           created_at: string
