@@ -1,38 +1,36 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Flame } from "@/components/Flame";
-import { attemptLogin, saveSession } from "@/lib/session";
-
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "CTC PVO — Connexion" },
-      { name: "description", content: "L'app de l'équipe féminine CTC PVO." },
-      { name: "theme-color", content: "#FF6A1F" },
-    ],
-  }),
-  component: Login,
-});
-
 function Login() {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("Léa");
+  const [firstName, setFirstName] = useState("");
   const [licence, setLicence] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName || !birthDate) return;
+
+    if (!firstName || !licence) return;
+
     setLoading(true);
     setError(null);
+
     try {
-      const joueuse = await attemptLogin(firstName.trim(), licence.trim());
+      const joueuse = await attemptLogin(
+        firstName.trim(),
+        licence.trim()
+      );
+
       if (!joueuse) {
-        setError("Aucune joueuse trouvée avec ce prénom et cette date.");
+        setError(
+          "Aucune joueuse trouvée avec ce prénom et ce numéro de licence."
+        );
         return;
       }
-      saveSession({ joueuseId: joueuse.id, prenom: joueuse.prenom });
+
+      saveSession({
+        joueuseId: joueuse.id,
+        prenom: joueuse.prenom,
+      });
+
       navigate({ to: "/home" });
     } catch (err) {
       console.error(err);
@@ -53,8 +51,12 @@ function Login() {
             <Flame size={32} />
           </div>
           <div>
-            <p className="font-display text-2xl font-black leading-none">CTC</p>
-            <p className="font-display text-2xl font-black leading-none text-primary">PVO</p>
+            <p className="font-display text-2xl font-black leading-none">
+              CTC
+            </p>
+            <p className="font-display text-2xl font-black leading-none text-primary">
+              PVO
+            </p>
           </div>
         </div>
 
@@ -62,14 +64,23 @@ function Login() {
           <h1 className="text-4xl font-black leading-tight">
             Allume ta <span className="text-primary">flamme</span> 🔥
           </h1>
+
           <p className="mt-3 text-white/70">
-            Connecte-toi pour rejoindre l'équipe, valider tes présences et grimper au classement.
+            Connecte-toi pour rejoindre l'équipe, valider tes présences et
+            grimper au classement.
           </p>
         </div>
 
-        <form onSubmit={submit} className="mt-10 flex flex-col gap-4 animate-slide-up" style={{ animationDelay: "0.1s" }}>
+        <form
+          onSubmit={submit}
+          className="mt-10 flex flex-col gap-4 animate-slide-up"
+          style={{ animationDelay: "0.1s" }}
+        >
           <label className="flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-white/60">Prénom</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-white/60">
+              Prénom
+            </span>
+
             <input
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -78,19 +89,19 @@ function Login() {
               required
             />
           </label>
-         <label className="flex flex-col gap-2">
-  <span className="text-xs font-bold uppercase tracking-wider text-white/60">
-    Numéro de licence
-  </span>
 
-  <input
-    value={licence}
-    onChange={(e) => setLicence(e.target.value)}
-    className="rounded-2xl border-2 border-white/10 bg-white/10 px-5 py-4 text-lg font-semibold text-white placeholder:text-white/40 focus:border-primary focus:outline-none"
-    placeholder="BC123456"
-    required
-  />
-</label>
+          <label className="flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/60">
+              Numéro de licence
+            </span>
+
+            <input
+              value={licence}
+              onChange={(e) => setLicence(e.target.value)}
+              className="rounded-2xl border-2 border-white/10 bg-white/10 px-5 py-4 text-lg font-semibold text-white placeholder:text-white/40 focus:border-primary focus:outline-none"
+              placeholder="BC123456"
+              required
+            />
           </label>
 
           {error && (
@@ -108,7 +119,7 @@ function Login() {
           </button>
 
           <p className="mt-2 text-center text-xs text-white/40">
-            Démo : Léa · 12/04/2008
+            Connexion avec prénom + numéro de licence
           </p>
         </form>
       </div>
