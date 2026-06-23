@@ -44,18 +44,16 @@ export async function findJoueuse(
   prenom: string,
   licence: string
 ) {
-  console.log("Recherche :", prenom, licence);
-
   const { data, error } = await supabase
     .from("joueuses")
     .select("*")
-    .eq("licence", licence);
-
-  console.log("Résultat :", data);
+    .ilike("prenom", prenom)
+    .eq("licence", licence)
+    .maybeSingle();
 
   if (error) throw error;
 
-  return data?.[0] ?? null;
+  return data;
 }
 
 export async function fetchJoueuseById(id: string) {
