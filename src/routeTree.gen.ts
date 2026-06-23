@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as CoachLoginRouteImport } from './routes/coach-login'
+import { Route as CoachDashboardRouteImport } from './routes/coach-dashboard'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRankingsRouteImport } from './routes/_app.rankings'
@@ -16,6 +18,16 @@ import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppFeedRouteImport } from './routes/_app.feed'
 import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
 
+const CoachLoginRoute = CoachLoginRouteImport.update({
+  id: '/coach-login',
+  path: '/coach-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachDashboardRoute = CoachDashboardRouteImport.update({
+  id: '/coach-dashboard',
+  path: '/coach-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -48,6 +60,8 @@ const AppCheckinRoute = AppCheckinRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/coach-dashboard': typeof CoachDashboardRoute
+  '/coach-login': typeof CoachLoginRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
@@ -55,6 +69,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/coach-dashboard': typeof CoachDashboardRoute
+  '/coach-login': typeof CoachLoginRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
@@ -64,6 +80,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/coach-dashboard': typeof CoachDashboardRoute
+  '/coach-login': typeof CoachLoginRoute
   '/_app/checkin': typeof AppCheckinRoute
   '/_app/feed': typeof AppFeedRoute
   '/_app/home': typeof AppHomeRoute
@@ -71,13 +89,29 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/checkin' | '/feed' | '/home' | '/rankings'
+  fullPaths:
+    | '/'
+    | '/coach-dashboard'
+    | '/coach-login'
+    | '/checkin'
+    | '/feed'
+    | '/home'
+    | '/rankings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/checkin' | '/feed' | '/home' | '/rankings'
+  to:
+    | '/'
+    | '/coach-dashboard'
+    | '/coach-login'
+    | '/checkin'
+    | '/feed'
+    | '/home'
+    | '/rankings'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/coach-dashboard'
+    | '/coach-login'
     | '/_app/checkin'
     | '/_app/feed'
     | '/_app/home'
@@ -87,10 +121,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  CoachDashboardRoute: typeof CoachDashboardRoute
+  CoachLoginRoute: typeof CoachLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/coach-login': {
+      id: '/coach-login'
+      path: '/coach-login'
+      fullPath: '/coach-login'
+      preLoaderRoute: typeof CoachLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-dashboard': {
+      id: '/coach-dashboard'
+      path: '/coach-dashboard'
+      fullPath: '/coach-dashboard'
+      preLoaderRoute: typeof CoachDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -155,6 +205,8 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  CoachDashboardRoute: CoachDashboardRoute,
+  CoachLoginRoute: CoachLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

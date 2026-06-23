@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      coachs: {
+        Row: {
+          created_at: string
+          id: string
+          mot_de_passe: string
+          nom: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mot_de_passe: string
+          nom: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mot_de_passe?: string
+          nom?: string
+        }
+        Relationships: []
+      }
       entrainements: {
         Row: {
           created_at: string
@@ -48,6 +69,7 @@ export type Database = {
           equipe: string
           flamme_actuelle: number
           id: string
+          licence: string | null
           photo: string | null
           prenom: string
           record_flamme: number
@@ -59,6 +81,7 @@ export type Database = {
           equipe?: string
           flamme_actuelle?: number
           id?: string
+          licence?: string | null
           photo?: string | null
           prenom: string
           record_flamme?: number
@@ -70,6 +93,7 @@ export type Database = {
           equipe?: string
           flamme_actuelle?: number
           id?: string
+          licence?: string | null
           photo?: string | null
           prenom?: string
           record_flamme?: number
