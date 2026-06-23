@@ -40,13 +40,14 @@ export async function fetchJoueuses(): Promise<Joueuse[]> {
   return data ?? [];
 }
 
-export async function findJoueuse(prenom: string, dateNaissance: string) {
+export async function findJoueuse(prenom: string, licence: string) {
   const { data, error } = await supabase
     .from("joueuses")
     .select("*")
     .ilike("prenom", prenom)
-    .eq("date_naissance", dateNaissance)
+    .eq("licence", licence)
     .maybeSingle();
+
   if (error) throw error;
   return data;
 }
