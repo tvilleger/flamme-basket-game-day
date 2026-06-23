@@ -40,16 +40,22 @@ export async function fetchJoueuses(): Promise<Joueuse[]> {
   return data ?? [];
 }
 
-export async function findJoueuse(prenom: string, licence: string) {
+export async function findJoueuse(
+  prenom: string,
+  licence: string
+) {
+  console.log("Recherche :", prenom, licence);
+
   const { data, error } = await supabase
     .from("joueuses")
     .select("*")
-    .ilike("prenom", prenom)
-    .eq("licence", licence)
-    .maybeSingle();
+    .eq("licence", licence);
+
+  console.log("Résultat :", data);
 
   if (error) throw error;
-  return data;
+
+  return data?.[0] ?? null;
 }
 
 export async function fetchJoueuseById(id: string) {
