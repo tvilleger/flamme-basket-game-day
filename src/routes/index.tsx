@@ -83,11 +83,13 @@ function Login() {
               Date de naissance
             </span>
             <input
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-              className="rounded-2xl border-2 border-white/10 bg-white/10 px-5 py-4 text-lg font-semibold text-white focus:border-primary focus:outline-none"
-              required
+              <input
+  value={licence}
+  onChange={(e) => setLicence(e.target.value)}
+  className="rounded-2xl border-2 border-white/10 bg-white/10 px-5 py-4 text-lg font-semibold text-white placeholder:text-white/40 focus:border-primary focus:outline-none"
+  placeholder="BC123456"
+  required
+/>
             />
           </label>
 
