@@ -179,3 +179,24 @@ export function formatRelative(iso: string) {
   if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`;
   return `il y a ${Math.floor(diff / 86400)} j`;
 }
+export type Coach = {
+  id: string;
+  nom: string;
+  mot_de_passe: string;
+};
+
+export async function findCoach(
+  nom: string,
+  motDePasse: string
+): Promise<Coach | null> {
+  const { data, error } = await supabase
+    .from("coachs")
+    .select("*")
+    .ilike("nom", nom)
+    .eq("mot_de_passe", motDePasse)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data;
+}
