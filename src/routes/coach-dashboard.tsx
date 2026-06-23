@@ -131,7 +131,7 @@ function CoachDashboard() {
           }
         }
 
-        // Fatigue prochain entraînement
+       // Fatigue prochain entraînement
 if (nextEntr) {
   const nextResponse = mine.find(
     (p) => p.entrainement_id === nextEntr.id
@@ -152,20 +152,20 @@ if (nextEntr) {
     });
   }
 }
-}
-      return {
-        effectif,
-        actives,
-        presenceEntrAvg,
-        presenceMatchAvg,
-        fatigueAvg,
-        flammeAvg,
-        nextEntr,
-        nextMatch,
-        alerts,
-      };
-    },
-  });
+
+} 
+
+return {
+  effectif,
+  actives,
+  presenceEntrAvg,
+  presenceMatchAvg,
+  fatigueAvg,
+  flammeAvg,
+  nextEntr,
+  nextMatch,
+  alerts,
+};
 
   const logout = () => {
     localStorage.removeItem("coach-session");
