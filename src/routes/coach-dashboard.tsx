@@ -113,15 +113,6 @@ function CoachDashboard() {
         const mine = presEntr.filter((p) => p.joueuse_id === j.id);
 
         // Aucune présence enregistrée
-        if (mine.length === 0) {
-          alerts.push({
-            joueuseId: j.id,
-            prenom: j.prenom,
-            photo: j.photo,
-            type: "no-data",
-            detail: "Aucune présence enregistrée",
-          });
-        }
 
         // 2 derniers entraînements absente
         if (last2EntrIds.length === 2) {
@@ -146,13 +137,13 @@ function CoachDashboard() {
           .filter((f): f is number => typeof f === "number");
         if (myFatigues.length > 0) {
           const avg = myFatigues.reduce((a, b) => a + b, 0) / myFatigues.length;
-          if (avg > 4) {
+          if (avg > 3) {
             alerts.push({
               joueuseId: j.id,
               prenom: j.prenom,
               photo: j.photo,
               type: "fatigue",
-              detail: `Fatigue moyenne ${avg.toFixed(1)}/5`,
+             detail: `Fatigue élevée (${avg.toFixed(1)}/5)`,
             });
           }
         }
