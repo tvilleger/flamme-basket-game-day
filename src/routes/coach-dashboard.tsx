@@ -65,7 +65,6 @@ function CoachDashboard() {
       const presMatch = presMatchRes.data ?? [];
       const entrs = entrRes.data ?? [];
 
-      // Stats équipe
       const effectif = joueuses.length;
       const blessees = joueuses.filter((j) => j.statut_blessure !== "OK");
       const actives = effectif - blessees.length;
@@ -90,7 +89,6 @@ function CoachDashboard() {
           )
         : 0;
 
-      // Alertes
       const alerts: AlertItem[] = [];
       const today = new Date().toISOString().slice(0, 10);
       const pastEntrs = entrs
@@ -99,7 +97,6 @@ function CoachDashboard() {
       const last2EntrIds = pastEntrs.slice(0, 2).map((e) => e.id);
 
       for (const j of joueuses) {
-        // Blessée
         if (j.statut_blessure !== "OK") {
           alerts.push({
             joueuseId: j.id,
@@ -112,9 +109,6 @@ function CoachDashboard() {
 
         const mine = presEntr.filter((p) => p.joueuse_id === j.id);
 
-        // Aucune présence enregistrée
-
-        // 2 derniers entraînements absente
         if (last2EntrIds.length === 2) {
           const recent = last2EntrIds.map((id) =>
             mine.find((p) => p.entrainement_id === id),
@@ -131,41 +125,39 @@ function CoachDashboard() {
           }
         }
 
-       // Fatigue prochain entraînement
-if (nextEntr) {
-  const nextResponse = mine.find(
-    (p) => p.entrainement_id === nextEntr.id
-  );
+        if (nextEntr) {
+          const nextResponse = mine.find((p) => p.entrainement_id === nextEntr.id);
+          if (
+            nextResponse &&
+            nextResponse.presente === true &&
+            nextResponse.fatigue !== null &&
+            (nextResponse.fatigue ?? 0) >= 4
+          ) {
+            alerts.push({
+              joueuseId: j.id,
+              prenom: j.prenom,
+              photo: j.photo,
+              type: "fatigue",
+              detail: `Fatigue élevée (${nextResponse.fatigue}/5)`,
+            });
+          }
+        }
+      }
 
-  if (
-    nextResponse &&
-    nextResponse.presente === true &&
-    nextResponse.fatigue !== null &&
-    nextResponse.fatigue >= 3
-  ) {
-    alerts.push({
-      joueuseId: j.id,
-      prenom: j.prenom,
-      photo: j.photo,
-      type: "fatigue",
-      detail: `Fatigue élevée (${nextResponse.fatigue}/5)`,
-    });
-  }
-}
-
-} 
-
-return {
-  effectif,
-  actives,
-  presenceEntrAvg,
-  presenceMatchAvg,
-  fatigueAvg,
-  flammeAvg,
-  nextEntr,
-  nextMatch,
-  alerts,
-};
+      return {
+        effectif,
+        actives,
+        blesseesCount: blessees.length,
+        presenceEntrAvg,
+        presenceMatchAvg,
+        fatigueAvg,
+        flammeAvg,
+        nextEntr,
+        nextMatch,
+        alerts,
+      };
+    },
+  });
 
   const logout = () => {
     localStorage.removeItem("coach-session");
@@ -177,7 +169,6 @@ return {
   return (
     <div className="min-h-screen bg-ink text-white">
       <div className="mx-auto max-w-2xl px-5 pb-20 pt-8">
-        {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-widest text-flame">Coach</p>
@@ -194,7 +185,6 @@ return {
           </button>
         </div>
 
-        {/* Stat cards */}
         <div className="grid grid-cols-2 gap-3">
           <StatCard label="Effectif" value={data?.effectif ?? "—"} accent />
           <StatCard label="Joueuses actives" value={data?.actives ?? "—"} />
@@ -208,13 +198,17 @@ return {
           />
           <StatCard label="Fatigue moyenne" value={data?.fatigueAvg ?? "—"} suffix="/5" />
           <StatCard
+            label="Joueuses blessées"
+            value={data?.blesseesCount ?? "—"}
+            icon={<Stethoscope className="h-5 w-5" />}
+          />
+          <StatCard
             label="Flamme moyenne"
             value={data?.flammeAvg ?? "—"}
             icon={<Flame className="h-5 w-5" />}
           />
         </div>
 
-        {/* Next events */}
         <div className="mt-6 grid gap-3">
           <Card className="border-0 bg-gradient-to-br from-flame to-orange-600 p-5 text-white shadow-[0_12px_32px_-8px_rgba(234,88,12,0.5)]">
             <p className="text-xs font-bold uppercase tracking-widest opacity-90">
@@ -226,7 +220,8 @@ return {
                   {formatFrDate(data.nextEntr.date)}
                 </p>
                 <p className="text-sm opacity-90">
-                  {data.nextEntr.heure.slice(0, 5)} · {data.nextEntr.lieu ?? data.nextEntr.equipe}
+                  {data.nextEntr.heure.slice(0, 5)} ·{" "}
+                  {data.nextEntr.lieu ?? data.nextEntr.equipe}
                 </p>
               </div>
             ) : (
@@ -240,7 +235,9 @@ return {
             </p>
             {data?.nextMatch ? (
               <div className="mt-2">
-                <p className="font-display text-xl font-black">vs {data.nextMatch.adversaire}</p>
+                <p className="font-display text-xl font-black">
+                  vs {data.nextMatch.adversaire}
+                </p>
                 <p className="text-sm capitalize text-white/70">
                   {formatFrDate(data.nextMatch.date)} · {data.nextMatch.heure.slice(0, 5)} ·{" "}
                   {data.nextMatch.lieu}
@@ -252,7 +249,6 @@ return {
           </Card>
         </div>
 
-        {/* Alertes */}
         <div className="mt-8">
           <div className="mb-3 flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-flame" />
@@ -281,7 +277,6 @@ return {
           )}
         </div>
 
-        {/* Quick actions */}
         <div className="mt-8">
           <h2 className="mb-3 font-display text-lg font-black">Actions rapides</h2>
           <div className="grid grid-cols-2 gap-3">
@@ -337,7 +332,10 @@ function StatCard({
 }
 
 function AlertRow({ alert }: { alert: AlertItem }) {
-  const palette: Record<AlertItem["type"], { bg: string; icon: React.ReactNode; border: string }> = {
+  const palette: Record<
+    AlertItem["type"],
+    { bg: string; icon: React.ReactNode; border: string }
+  > = {
     blessure: {
       bg: "bg-red-500/10",
       border: "border-red-500/30",
@@ -361,9 +359,7 @@ function AlertRow({ alert }: { alert: AlertItem }) {
   };
   const p = palette[alert.type];
   return (
-    <div
-      className={`flex items-center gap-3 rounded-2xl border ${p.border} ${p.bg} p-3`}
-    >
+    <div className={`flex items-center gap-3 rounded-2xl border ${p.border} ${p.bg} p-3`}>
       <img
         src={getAvatar(alert.prenom, alert.photo)}
         alt={alert.prenom}

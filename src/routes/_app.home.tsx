@@ -1,5 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Flame } from "@/components/Flame";
 import { getSession, clearSession } from "@/lib/session";
 import {
@@ -10,7 +13,7 @@ import {
   formatFrDate,
   getAvatar,
 } from "@/lib/api";
-import { Calendar, Swords, LogOut, TrendingUp, Activity } from "lucide-react";
+import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -18,7 +21,10 @@ export const Route = createFileRoute("/_app/home")({
 
 function HomePage() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const session = getSession();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const playerQ = useQuery({
     queryKey: ["joueuse", session?.joueuseId],
@@ -36,6 +42,40 @@ function HomePage() {
   const logout = () => {
     clearSession();
     navigate({ to: "/" });
+  };
+
+  const onPickPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !session) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image trop lourde (max 5 Mo)");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${session.joueuseId}/${Date.now()}.${ext}`;
+      const up = await supabase.storage
+        .from("photos-joueuses")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (up.error) throw up.error;
+      const signed = await supabase.storage
+        .from("photos-joueuses")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (signed.error) throw signed.error;
+      const { error: updErr } = await supabase
+        .from("joueuses")
+        .update({ photo: signed.data.signedUrl })
+        .eq("id", session.joueuseId);
+      if (updErr) throw updErr;
+      toast.success("Photo mise à jour");
+      qc.invalidateQueries({ queryKey: ["joueuse", session.joueuseId] });
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (!session || !playerQ.data) {
@@ -73,6 +113,22 @@ function HomePage() {
               width={96}
               height={96}
               className="h-20 w-20 rounded-2xl border-2 border-white/20 bg-white object-cover"
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              aria-label="Changer ma photo"
+              className="absolute -bottom-2 -left-2 grid h-9 w-9 place-items-center rounded-full bg-white text-ink shadow ring-2 ring-ink disabled:opacity-50"
+            >
+              <Camera size={16} />
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onPickPhoto}
             />
             <span className="absolute -bottom-2 -right-2 grid h-9 w-9 place-items-center rounded-full bg-gradient-flame shadow-flame">
               <Flame size={20} />
