@@ -29,6 +29,7 @@ export type Joueuse = {
   flamme_actuelle: number;
   record_flamme: number;
   statut_blessure: string;
+  licence: string | null;
 };
 
 export async function fetchJoueuses(): Promise<Joueuse[]> {

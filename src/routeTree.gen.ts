@@ -9,7 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as CoachPresencesRouteImport } from './routes/coach-presences'
+import { Route as CoachMessagesRouteImport } from './routes/coach-messages'
+import { Route as CoachMatchsRouteImport } from './routes/coach-matchs'
 import { Route as CoachLoginRouteImport } from './routes/coach-login'
+import { Route as CoachFlammesRouteImport } from './routes/coach-flammes'
+import { Route as CoachExportsRouteImport } from './routes/coach-exports'
+import { Route as CoachEntrainementsRouteImport } from './routes/coach-entrainements'
+import { Route as CoachEffectifRouteImport } from './routes/coach-effectif'
 import { Route as CoachDashboardRouteImport } from './routes/coach-dashboard'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,9 +25,44 @@ import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppFeedRouteImport } from './routes/_app.feed'
 import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
 
+const CoachPresencesRoute = CoachPresencesRouteImport.update({
+  id: '/coach-presences',
+  path: '/coach-presences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachMessagesRoute = CoachMessagesRouteImport.update({
+  id: '/coach-messages',
+  path: '/coach-messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachMatchsRoute = CoachMatchsRouteImport.update({
+  id: '/coach-matchs',
+  path: '/coach-matchs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoachLoginRoute = CoachLoginRouteImport.update({
   id: '/coach-login',
   path: '/coach-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachFlammesRoute = CoachFlammesRouteImport.update({
+  id: '/coach-flammes',
+  path: '/coach-flammes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachExportsRoute = CoachExportsRouteImport.update({
+  id: '/coach-exports',
+  path: '/coach-exports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachEntrainementsRoute = CoachEntrainementsRouteImport.update({
+  id: '/coach-entrainements',
+  path: '/coach-entrainements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachEffectifRoute = CoachEffectifRouteImport.update({
+  id: '/coach-effectif',
+  path: '/coach-effectif',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoachDashboardRoute = CoachDashboardRouteImport.update({
@@ -61,7 +103,14 @@ const AppCheckinRoute = AppCheckinRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coach-dashboard': typeof CoachDashboardRoute
+  '/coach-effectif': typeof CoachEffectifRoute
+  '/coach-entrainements': typeof CoachEntrainementsRoute
+  '/coach-exports': typeof CoachExportsRoute
+  '/coach-flammes': typeof CoachFlammesRoute
   '/coach-login': typeof CoachLoginRoute
+  '/coach-matchs': typeof CoachMatchsRoute
+  '/coach-messages': typeof CoachMessagesRoute
+  '/coach-presences': typeof CoachPresencesRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
@@ -70,7 +119,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coach-dashboard': typeof CoachDashboardRoute
+  '/coach-effectif': typeof CoachEffectifRoute
+  '/coach-entrainements': typeof CoachEntrainementsRoute
+  '/coach-exports': typeof CoachExportsRoute
+  '/coach-flammes': typeof CoachFlammesRoute
   '/coach-login': typeof CoachLoginRoute
+  '/coach-matchs': typeof CoachMatchsRoute
+  '/coach-messages': typeof CoachMessagesRoute
+  '/coach-presences': typeof CoachPresencesRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
@@ -81,7 +137,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/coach-dashboard': typeof CoachDashboardRoute
+  '/coach-effectif': typeof CoachEffectifRoute
+  '/coach-entrainements': typeof CoachEntrainementsRoute
+  '/coach-exports': typeof CoachExportsRoute
+  '/coach-flammes': typeof CoachFlammesRoute
   '/coach-login': typeof CoachLoginRoute
+  '/coach-matchs': typeof CoachMatchsRoute
+  '/coach-messages': typeof CoachMessagesRoute
+  '/coach-presences': typeof CoachPresencesRoute
   '/_app/checkin': typeof AppCheckinRoute
   '/_app/feed': typeof AppFeedRoute
   '/_app/home': typeof AppHomeRoute
@@ -92,7 +155,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/coach-dashboard'
+    | '/coach-effectif'
+    | '/coach-entrainements'
+    | '/coach-exports'
+    | '/coach-flammes'
     | '/coach-login'
+    | '/coach-matchs'
+    | '/coach-messages'
+    | '/coach-presences'
     | '/checkin'
     | '/feed'
     | '/home'
@@ -101,7 +171,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/coach-dashboard'
+    | '/coach-effectif'
+    | '/coach-entrainements'
+    | '/coach-exports'
+    | '/coach-flammes'
     | '/coach-login'
+    | '/coach-matchs'
+    | '/coach-messages'
+    | '/coach-presences'
     | '/checkin'
     | '/feed'
     | '/home'
@@ -111,7 +188,14 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/coach-dashboard'
+    | '/coach-effectif'
+    | '/coach-entrainements'
+    | '/coach-exports'
+    | '/coach-flammes'
     | '/coach-login'
+    | '/coach-matchs'
+    | '/coach-messages'
+    | '/coach-presences'
     | '/_app/checkin'
     | '/_app/feed'
     | '/_app/home'
@@ -122,16 +206,72 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   CoachDashboardRoute: typeof CoachDashboardRoute
+  CoachEffectifRoute: typeof CoachEffectifRoute
+  CoachEntrainementsRoute: typeof CoachEntrainementsRoute
+  CoachExportsRoute: typeof CoachExportsRoute
+  CoachFlammesRoute: typeof CoachFlammesRoute
   CoachLoginRoute: typeof CoachLoginRoute
+  CoachMatchsRoute: typeof CoachMatchsRoute
+  CoachMessagesRoute: typeof CoachMessagesRoute
+  CoachPresencesRoute: typeof CoachPresencesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/coach-presences': {
+      id: '/coach-presences'
+      path: '/coach-presences'
+      fullPath: '/coach-presences'
+      preLoaderRoute: typeof CoachPresencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-messages': {
+      id: '/coach-messages'
+      path: '/coach-messages'
+      fullPath: '/coach-messages'
+      preLoaderRoute: typeof CoachMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-matchs': {
+      id: '/coach-matchs'
+      path: '/coach-matchs'
+      fullPath: '/coach-matchs'
+      preLoaderRoute: typeof CoachMatchsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/coach-login': {
       id: '/coach-login'
       path: '/coach-login'
       fullPath: '/coach-login'
       preLoaderRoute: typeof CoachLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-flammes': {
+      id: '/coach-flammes'
+      path: '/coach-flammes'
+      fullPath: '/coach-flammes'
+      preLoaderRoute: typeof CoachFlammesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-exports': {
+      id: '/coach-exports'
+      path: '/coach-exports'
+      fullPath: '/coach-exports'
+      preLoaderRoute: typeof CoachExportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-entrainements': {
+      id: '/coach-entrainements'
+      path: '/coach-entrainements'
+      fullPath: '/coach-entrainements'
+      preLoaderRoute: typeof CoachEntrainementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-effectif': {
+      id: '/coach-effectif'
+      path: '/coach-effectif'
+      fullPath: '/coach-effectif'
+      preLoaderRoute: typeof CoachEffectifRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/coach-dashboard': {
@@ -206,7 +346,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   CoachDashboardRoute: CoachDashboardRoute,
+  CoachEffectifRoute: CoachEffectifRoute,
+  CoachEntrainementsRoute: CoachEntrainementsRoute,
+  CoachExportsRoute: CoachExportsRoute,
+  CoachFlammesRoute: CoachFlammesRoute,
   CoachLoginRoute: CoachLoginRoute,
+  CoachMatchsRoute: CoachMatchsRoute,
+  CoachMessagesRoute: CoachMessagesRoute,
+  CoachPresencesRoute: CoachPresencesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
