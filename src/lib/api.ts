@@ -135,6 +135,7 @@ export type Message = {
   id: string;
   titre: string | null;
   contenu: string;
+  auteur: string | null;
   date_publication: string;
 };
 
