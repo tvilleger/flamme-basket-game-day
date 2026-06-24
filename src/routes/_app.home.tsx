@@ -21,7 +21,10 @@ export const Route = createFileRoute("/_app/home")({
 
 function HomePage() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const session = getSession();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const playerQ = useQuery({
     queryKey: ["joueuse", session?.joueuseId],
@@ -39,6 +42,40 @@ function HomePage() {
   const logout = () => {
     clearSession();
     navigate({ to: "/" });
+  };
+
+  const onPickPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !session) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image trop lourde (max 5 Mo)");
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${session.joueuseId}/${Date.now()}.${ext}`;
+      const up = await supabase.storage
+        .from("photos-joueuses")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (up.error) throw up.error;
+      const signed = await supabase.storage
+        .from("photos-joueuses")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (signed.error) throw signed.error;
+      const { error: updErr } = await supabase
+        .from("joueuses")
+        .update({ photo: signed.data.signedUrl })
+        .eq("id", session.joueuseId);
+      if (updErr) throw updErr;
+      toast.success("Photo mise à jour");
+      qc.invalidateQueries({ queryKey: ["joueuse", session.joueuseId] });
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (!session || !playerQ.data) {
