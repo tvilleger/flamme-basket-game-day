@@ -114,6 +114,22 @@ function HomePage() {
               height={96}
               className="h-20 w-20 rounded-2xl border-2 border-white/20 bg-white object-cover"
             />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              aria-label="Changer ma photo"
+              className="absolute -bottom-2 -left-2 grid h-9 w-9 place-items-center rounded-full bg-white text-ink shadow ring-2 ring-ink disabled:opacity-50"
+            >
+              <Camera size={16} />
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onPickPhoto}
+            />
             <span className="absolute -bottom-2 -right-2 grid h-9 w-9 place-items-center rounded-full bg-gradient-flame shadow-flame">
               <Flame size={20} />
             </span>
