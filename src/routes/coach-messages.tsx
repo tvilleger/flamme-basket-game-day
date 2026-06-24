@@ -32,7 +32,11 @@ function CoachMessages() {
     setSending(true);
     const { error } = await supabase
       .from("messages_coach")
-      .insert({ titre: titre.trim() || null, contenu: contenu.trim() });
+      .insert({
+  titre: titre.trim() || null,
+  contenu: contenu.trim(),
+  auteur: coach.nom,
+});
     setSending(false);
     if (error) {
       toast.error(error.message);
