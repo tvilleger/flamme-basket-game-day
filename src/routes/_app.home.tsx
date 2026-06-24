@@ -1,5 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Flame } from "@/components/Flame";
 import { getSession, clearSession } from "@/lib/session";
 import {
@@ -10,7 +13,7 @@ import {
   formatFrDate,
   getAvatar,
 } from "@/lib/api";
-import { Calendar, Swords, LogOut, TrendingUp, Activity } from "lucide-react";
+import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
