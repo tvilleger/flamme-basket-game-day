@@ -58,7 +58,9 @@ function PostCard({ post, delay }: { post: Message; delay: number }) {
           className="h-11 w-11 shrink-0 rounded-2xl bg-muted object-cover"
         />
         <div className="min-w-0">
-          <p className="truncate text-sm font-black">Coach Sandra</p>
+         <p className="truncate text-sm font-black">
+  {post.auteur || "Coach"}
+</p>
           <p className="text-xs text-muted-foreground">{formatRelative(post.date_publication)}</p>
         </div>
         <span className="ml-auto shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-primary">
