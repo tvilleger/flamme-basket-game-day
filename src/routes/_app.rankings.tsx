@@ -56,6 +56,11 @@ function RankingsPage() {
     queryFn: () => fetchAttendanceRanking("match"),
     enabled: tab === "match",
   });
+  const starsQ = useQuery({
+    queryKey: ["ranking-stars"],
+    queryFn: fetchStarsRanking,
+    enabled: tab === "stars",
+  });
 
   return (
     <div className="px-5 pt-8">
