@@ -39,6 +39,11 @@ function HomePage() {
   });
   const trainingQ = useQuery({ queryKey: ["next-training"], queryFn: fetchNextEntrainement });
   const matchQ = useQuery({ queryKey: ["next-match"], queryFn: fetchNextMatch });
+  const etoilesQ = useQuery({
+    queryKey: ["etoiles-total", session?.joueuseId],
+    queryFn: () => fetchTotalEtoiles(session!.joueuseId),
+    enabled: !!session,
+  });
 
   const logout = () => {
     clearSession();
