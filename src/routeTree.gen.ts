@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as CoachPresencesRouteImport } from './routes/coach-presences'
+import { Route as CoachMissionsRouteImport } from './routes/coach-missions'
 import { Route as CoachMessagesRouteImport } from './routes/coach-messages'
 import { Route as CoachMatchsRouteImport } from './routes/coach-matchs'
 import { Route as CoachLoginRouteImport } from './routes/coach-login'
@@ -21,6 +22,7 @@ import { Route as CoachDashboardRouteImport } from './routes/coach-dashboard'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRankingsRouteImport } from './routes/_app.rankings'
+import { Route as AppMissionsRouteImport } from './routes/_app.missions'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppFeedRouteImport } from './routes/_app.feed'
 import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
@@ -28,6 +30,11 @@ import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
 const CoachPresencesRoute = CoachPresencesRouteImport.update({
   id: '/coach-presences',
   path: '/coach-presences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachMissionsRoute = CoachMissionsRouteImport.update({
+  id: '/coach-missions',
+  path: '/coach-missions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoachMessagesRoute = CoachMessagesRouteImport.update({
@@ -84,6 +91,11 @@ const AppRankingsRoute = AppRankingsRouteImport.update({
   path: '/rankings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMissionsRoute = AppMissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -110,10 +122,12 @@ export interface FileRoutesByFullPath {
   '/coach-login': typeof CoachLoginRoute
   '/coach-matchs': typeof CoachMatchsRoute
   '/coach-messages': typeof CoachMessagesRoute
+  '/coach-missions': typeof CoachMissionsRoute
   '/coach-presences': typeof CoachPresencesRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
+  '/missions': typeof AppMissionsRoute
   '/rankings': typeof AppRankingsRoute
 }
 export interface FileRoutesByTo {
@@ -126,10 +140,12 @@ export interface FileRoutesByTo {
   '/coach-login': typeof CoachLoginRoute
   '/coach-matchs': typeof CoachMatchsRoute
   '/coach-messages': typeof CoachMessagesRoute
+  '/coach-missions': typeof CoachMissionsRoute
   '/coach-presences': typeof CoachPresencesRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
+  '/missions': typeof AppMissionsRoute
   '/rankings': typeof AppRankingsRoute
 }
 export interface FileRoutesById {
@@ -144,10 +160,12 @@ export interface FileRoutesById {
   '/coach-login': typeof CoachLoginRoute
   '/coach-matchs': typeof CoachMatchsRoute
   '/coach-messages': typeof CoachMessagesRoute
+  '/coach-missions': typeof CoachMissionsRoute
   '/coach-presences': typeof CoachPresencesRoute
   '/_app/checkin': typeof AppCheckinRoute
   '/_app/feed': typeof AppFeedRoute
   '/_app/home': typeof AppHomeRoute
+  '/_app/missions': typeof AppMissionsRoute
   '/_app/rankings': typeof AppRankingsRoute
 }
 export interface FileRouteTypes {
@@ -162,10 +180,12 @@ export interface FileRouteTypes {
     | '/coach-login'
     | '/coach-matchs'
     | '/coach-messages'
+    | '/coach-missions'
     | '/coach-presences'
     | '/checkin'
     | '/feed'
     | '/home'
+    | '/missions'
     | '/rankings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -178,10 +198,12 @@ export interface FileRouteTypes {
     | '/coach-login'
     | '/coach-matchs'
     | '/coach-messages'
+    | '/coach-missions'
     | '/coach-presences'
     | '/checkin'
     | '/feed'
     | '/home'
+    | '/missions'
     | '/rankings'
   id:
     | '__root__'
@@ -195,10 +217,12 @@ export interface FileRouteTypes {
     | '/coach-login'
     | '/coach-matchs'
     | '/coach-messages'
+    | '/coach-missions'
     | '/coach-presences'
     | '/_app/checkin'
     | '/_app/feed'
     | '/_app/home'
+    | '/_app/missions'
     | '/_app/rankings'
   fileRoutesById: FileRoutesById
 }
@@ -213,6 +237,7 @@ export interface RootRouteChildren {
   CoachLoginRoute: typeof CoachLoginRoute
   CoachMatchsRoute: typeof CoachMatchsRoute
   CoachMessagesRoute: typeof CoachMessagesRoute
+  CoachMissionsRoute: typeof CoachMissionsRoute
   CoachPresencesRoute: typeof CoachPresencesRoute
 }
 
@@ -223,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/coach-presences'
       fullPath: '/coach-presences'
       preLoaderRoute: typeof CoachPresencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach-missions': {
+      id: '/coach-missions'
+      path: '/coach-missions'
+      fullPath: '/coach-missions'
+      preLoaderRoute: typeof CoachMissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/coach-messages': {
@@ -302,6 +334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRankingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/missions': {
+      id: '/_app/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof AppMissionsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/home': {
       id: '/_app/home'
       path: '/home'
@@ -330,6 +369,7 @@ interface AppRouteChildren {
   AppCheckinRoute: typeof AppCheckinRoute
   AppFeedRoute: typeof AppFeedRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppMissionsRoute: typeof AppMissionsRoute
   AppRankingsRoute: typeof AppRankingsRoute
 }
 
@@ -337,6 +377,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCheckinRoute: AppCheckinRoute,
   AppFeedRoute: AppFeedRoute,
   AppHomeRoute: AppHomeRoute,
+  AppMissionsRoute: AppMissionsRoute,
   AppRankingsRoute: AppRankingsRoute,
 }
 
@@ -353,6 +394,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoachLoginRoute: CoachLoginRoute,
   CoachMatchsRoute: CoachMatchsRoute,
   CoachMessagesRoute: CoachMessagesRoute,
+  CoachMissionsRoute: CoachMissionsRoute,
   CoachPresencesRoute: CoachPresencesRoute,
 }
 export const routeTree = rootRouteImport

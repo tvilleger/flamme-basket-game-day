@@ -10,12 +10,13 @@ export const Route = createFileRoute("/_app/rankings")({
   component: RankingsPage,
 });
 
-type Tab = "training" | "match" | "flame" | "hof";
+type Tab = "training" | "match" | "flame" | "stars" | "hof";
 
 const tabs: { id: Tab; label: string }[] = [
+  { id: "flame", label: "Flammes" },
+  { id: "stars", label: "Étoiles" },
   { id: "training", label: "Entraîn." },
   { id: "match", label: "Matchs" },
-  { id: "flame", label: "Flammes" },
   { id: "hof", label: "Hall of Fame" },
 ];
 
@@ -41,6 +42,29 @@ async function fetchAttendanceRanking(kind: "training" | "match") {
     .sort((a, b) => b.value - a.value);
 }
 
+async function fetchStarsRanking() {
+  const [{ data: joueuses }, { data: etoiles }, { data: inscriptions }] = await Promise.all([
+    supabase.from("joueuses").select("*"),
+    supabase.from("etoiles_joueuses").select("joueuse_id, etoiles"),
+    supabase.from("missions_inscriptions").select("joueuse_id, statut"),
+  ]);
+  const totals = new Map<string, number>();
+  (etoiles ?? []).forEach((e) => {
+    totals.set(e.joueuse_id, (totals.get(e.joueuse_id) ?? 0) + (e.etoiles ?? 0));
+  });
+  const validated = new Map<string, number>();
+  (inscriptions ?? [])
+    .filter((i) => i.statut === "validee" || i.statut === "terminee")
+    .forEach((i) => validated.set(i.joueuse_id, (validated.get(i.joueuse_id) ?? 0) + 1));
+  return (joueuses ?? [])
+    .map((j) => ({
+      joueuse: j as Joueuse,
+      value: totals.get(j.id) ?? 0,
+      missions: validated.get(j.id) ?? 0,
+    }))
+    .sort((a, b) => b.value - a.value || b.missions - a.missions);
+}
+
 function RankingsPage() {
   const [tab, setTab] = useState<Tab>("flame");
 
@@ -54,6 +78,11 @@ function RankingsPage() {
     queryKey: ["ranking-match"],
     queryFn: () => fetchAttendanceRanking("match"),
     enabled: tab === "match",
+  });
+  const starsQ = useQuery({
+    queryKey: ["ranking-stars"],
+    queryFn: fetchStarsRanking,
+    enabled: tab === "stars",
   });
 
   return (
@@ -88,6 +117,8 @@ function RankingsPage() {
         />
       ) : tab === "training" ? (
         <RankingList items={trainingQ.data ?? []} suffix="%" />
+      ) : tab === "stars" ? (
+        <RankingList items={starsQ.data ?? []} suffix=" ⭐" />
       ) : (
         <RankingList items={matchQ.data ?? []} suffix="%" />
       )}

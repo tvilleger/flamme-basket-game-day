@@ -62,6 +62,48 @@ export type Database = {
         }
         Relationships: []
       }
+      etoiles_joueuses: {
+        Row: {
+          date: string
+          etoiles: number
+          id: string
+          joueuse_id: string
+          mission_id: string | null
+          motif: string | null
+        }
+        Insert: {
+          date?: string
+          etoiles: number
+          id?: string
+          joueuse_id: string
+          mission_id?: string | null
+          motif?: string | null
+        }
+        Update: {
+          date?: string
+          etoiles?: number
+          id?: string
+          joueuse_id?: string
+          mission_id?: string | null
+          motif?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "etoiles_joueuses_joueuse_id_fkey"
+            columns: ["joueuse_id"]
+            isOneToOne: false
+            referencedRelation: "joueuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "etoiles_joueuses_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historique_flammes: {
         Row: {
           coach: string | null
@@ -183,6 +225,99 @@ export type Database = {
           titre?: string | null
         }
         Relationships: []
+      }
+      missions: {
+        Row: {
+          archivee: boolean
+          automatique: boolean
+          categorie: string | null
+          created_at: string
+          date: string | null
+          description: string | null
+          etoiles: number
+          id: string
+          places_max: number
+          recurrente: boolean
+          titre: string
+          updated_at: string
+        }
+        Insert: {
+          archivee?: boolean
+          automatique?: boolean
+          categorie?: string | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          etoiles?: number
+          id?: string
+          places_max?: number
+          recurrente?: boolean
+          titre: string
+          updated_at?: string
+        }
+        Update: {
+          archivee?: boolean
+          automatique?: boolean
+          categorie?: string | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          etoiles?: number
+          id?: string
+          places_max?: number
+          recurrente?: boolean
+          titre?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      missions_inscriptions: {
+        Row: {
+          coach_validateur: string | null
+          date_inscription: string
+          date_validation: string | null
+          id: string
+          joueuse_id: string
+          mission_id: string
+          motif_refus: string | null
+          statut: string
+        }
+        Insert: {
+          coach_validateur?: string | null
+          date_inscription?: string
+          date_validation?: string | null
+          id?: string
+          joueuse_id: string
+          mission_id: string
+          motif_refus?: string | null
+          statut?: string
+        }
+        Update: {
+          coach_validateur?: string | null
+          date_inscription?: string
+          date_validation?: string | null
+          id?: string
+          joueuse_id?: string
+          mission_id?: string
+          motif_refus?: string | null
+          statut?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_inscriptions_joueuse_id_fkey"
+            columns: ["joueuse_id"]
+            isOneToOne: false
+            referencedRelation: "joueuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_inscriptions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       presences_entrainements: {
         Row: {

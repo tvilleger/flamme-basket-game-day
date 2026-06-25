@@ -13,7 +13,8 @@ import {
   formatFrDate,
   getAvatar,
 } from "@/lib/api";
-import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera } from "lucide-react";
+import { fetchTotalEtoiles } from "@/lib/missions";
+import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -38,6 +39,11 @@ function HomePage() {
   });
   const trainingQ = useQuery({ queryKey: ["next-training"], queryFn: fetchNextEntrainement });
   const matchQ = useQuery({ queryKey: ["next-match"], queryFn: fetchNextMatch });
+  const etoilesQ = useQuery({
+    queryKey: ["etoiles-total", session?.joueuseId],
+    queryFn: () => fetchTotalEtoiles(session!.joueuseId),
+    enabled: !!session,
+  });
 
   const logout = () => {
     clearSession();
@@ -148,9 +154,10 @@ function HomePage() {
           </div>
         </div>
 
-        <div className="relative mt-5 grid grid-cols-2 gap-3">
+        <div className="relative mt-5 grid grid-cols-3 gap-2">
           <Stat icon={<Flame size={18} animate={false} />} label="Flamme" value={`${player.flamme_actuelle}j`} tone="flame" />
           <Stat icon={<TrendingUp size={18} />} label="Record" value={`${player.record_flamme}j`} tone="dark" />
+          <Stat icon={<Star size={18} />} label="Étoiles" value={`${etoilesQ.data ?? 0}`} tone="dark" />
         </div>
       </section>
 

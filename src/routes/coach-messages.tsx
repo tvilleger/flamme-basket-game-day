@@ -33,10 +33,9 @@ function CoachMessages() {
     const { error } = await supabase
       .from("messages_coach")
       .insert({
-  titre: titre.trim() || null,
-  contenu: contenu.trim(),
-  auteur: coach.nom,
-});
+        titre: titre.trim() || null,
+        contenu: contenu.trim(),
+      });
     setSending(false);
     if (error) {
       toast.error(error.message);

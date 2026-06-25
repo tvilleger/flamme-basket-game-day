@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Star } from "lucide-react";
+import { toast } from "sonner";
 import { fetchNextEntrainement, formatFrDate, submitCheckin } from "@/lib/api";
 import { getSession } from "@/lib/session";
+import { getOrCreateAutoMission, inscrireMission, fetchMissionTakenCount } from "@/lib/missions";
 
 export const Route = createFileRoute("/_app/checkin")({
   component: CheckinPage,
@@ -45,6 +47,14 @@ function CheckinPage() {
         </div>
         <h1 className="mt-6 text-3xl font-black">Check-in validé !</h1>
         <p className="mt-2 text-muted-foreground">Ta réponse a été enregistrée 🔥</p>
+
+        {presence === "yes" && trainingQ.data && (
+          <AutoMissionCard
+            entrainementDate={trainingQ.data.date}
+            joueuseId={session!.joueuseId}
+          />
+        )}
+
         <button
           onClick={() => { setDone(false); setPresence(null); setFatigue(0); }}
           className="mt-8 rounded-2xl bg-secondary px-6 py-3 font-bold text-secondary-foreground"
@@ -148,6 +158,68 @@ function CheckinPage() {
         <Sparkles size={20} />
         {mutation.isPending ? "Envoi..." : "Valider mon check-in"}
       </button>
+    </div>
+  );
+}
+
+function AutoMissionCard({
+  entrainementDate,
+  joueuseId,
+}: {
+  entrainementDate: string;
+  joueuseId: string;
+}) {
+  const qc = useQueryClient();
+  const missionQ = useQuery({
+    queryKey: ["auto-mission", entrainementDate],
+    queryFn: () => getOrCreateAutoMission(entrainementDate),
+  });
+  const takenQ = useQuery({
+    queryKey: ["auto-mission-taken", missionQ.data?.id],
+    queryFn: () => fetchMissionTakenCount(missionQ.data!.id),
+    enabled: !!missionQ.data?.id,
+  });
+  const subscribe = useMutation({
+    mutationFn: () => inscrireMission(missionQ.data!.id, joueuseId),
+    onSuccess: () => {
+      toast.success("Tu es inscrite ! En attente du coach.");
+      qc.invalidateQueries({ queryKey: ["auto-mission-taken", missionQ.data?.id] });
+      qc.invalidateQueries({ queryKey: ["missions-inscriptions"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (!missionQ.data) return null;
+  const taken = takenQ.data ?? [];
+  const restantes = Math.max(0, missionQ.data.places_max - taken.length);
+  const already = taken.some((t) => t.joueuse_id === joueuseId);
+
+  return (
+    <div className="mt-8 w-full max-w-sm rounded-3xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-transparent p-5 text-left shadow-card">
+      <div className="flex items-center gap-2">
+        <Star className="h-5 w-5 text-primary" />
+        <p className="text-xs font-black uppercase tracking-wider text-primary">
+          Mission bonus
+        </p>
+      </div>
+      <p className="mt-2 text-lg font-black">Rangement du matériel</p>
+      <p className="text-sm text-muted-foreground">+10 ⭐ · {restantes} place{restantes > 1 ? "s" : ""} restante{restantes > 1 ? "s" : ""}</p>
+      {already ? (
+        <div className="mt-3 rounded-xl bg-emerald-500/15 px-3 py-2 text-center text-xs font-bold text-emerald-600 dark:text-emerald-400">
+          ✅ Inscription envoyée — en attente coach
+        </div>
+      ) : (
+        <button
+          onClick={() => subscribe.mutate()}
+          disabled={subscribe.isPending || restantes === 0}
+          className="mt-3 w-full rounded-2xl bg-gradient-flame py-2.5 text-sm font-black text-white shadow-flame disabled:opacity-40"
+        >
+          {restantes === 0 ? "Complète" : "Je participe"}
+        </button>
+      )}
+      <Link to="/missions" className="mt-3 block text-center text-xs font-bold text-primary underline">
+        Voir toutes les missions
+      </Link>
     </div>
   );
 }
