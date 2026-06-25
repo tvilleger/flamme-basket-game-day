@@ -42,6 +42,12 @@ function CoachMissions() {
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editing, setEditing] = useState(false);
+  const [direct, setDirect] = useState<{ joueuseId: string; etoiles: number; motif: string }>({
+    joueuseId: "",
+    etoiles: 5,
+    motif: "",
+  });
+
 
   const missionsQ = useQuery({ queryKey: ["missions"], queryFn: fetchMissions });
   const inscQ = useQuery({ queryKey: ["missions-inscriptions"], queryFn: fetchInscriptions });
@@ -119,6 +125,29 @@ function CoachMissions() {
       qc.invalidateQueries({ queryKey: ["missions-inscriptions"] });
     },
   });
+
+  const awardDirect = useMutation({
+    mutationFn: async () => {
+      if (!direct.joueuseId) throw new Error("Choisis une joueuse");
+      const nb = Number(direct.etoiles);
+      if (!nb || nb < 1) throw new Error("Nombre d'étoiles invalide");
+      const { error } = await supabase.from("etoiles_joueuses").insert({
+        joueuse_id: direct.joueuseId,
+        etoiles: nb,
+        motif: direct.motif.trim() || "Attribution directe",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(`+${direct.etoiles} ⭐ attribuée`);
+      setDirect({ joueuseId: "", etoiles: 5, motif: "" });
+      qc.invalidateQueries({ queryKey: ["etoiles-total"] });
+      qc.invalidateQueries({ queryKey: ["ranking-stars"] });
+      qc.invalidateQueries({ queryKey: ["coach-dashboard"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   if (!coach) return null;
 
@@ -221,6 +250,48 @@ function CoachMissions() {
         </Card>
 
         <section className="mt-8">
+          <h2 className="mb-3 font-display text-lg font-black">⭐ Attribuer des étoiles</h2>
+          <Card className="border border-white/10 bg-white/5 p-4">
+            <div className="grid gap-2">
+              <select
+                value={direct.joueuseId}
+                onChange={(e) => setDirect({ ...direct, joueuseId: e.target.value })}
+                className="rounded-xl border border-white/10 bg-ink px-3 py-2 text-sm text-white"
+              >
+                <option value="">— Choisir une joueuse —</option>
+                {(joueusesQ.data ?? []).map((j) => (
+                  <option key={j.id} value={j.id}>{j.prenom}</option>
+                ))}
+              </select>
+              <div className="grid grid-cols-[100px_1fr] gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  value={direct.etoiles}
+                  onChange={(e) => setDirect({ ...direct, etoiles: Number(e.target.value) })}
+                  className="rounded-xl border border-white/10 bg-ink px-3 py-2 text-sm text-white"
+                  aria-label="Nombre d'étoiles"
+                />
+                <input
+                  value={direct.motif}
+                  onChange={(e) => setDirect({ ...direct, motif: e.target.value })}
+                  placeholder="Motif (optionnel)"
+                  className="rounded-xl border border-white/10 bg-ink px-3 py-2 text-sm text-white"
+                />
+              </div>
+              <button
+                onClick={() => awardDirect.mutate()}
+                disabled={awardDirect.isPending || !direct.joueuseId}
+                className="mt-1 inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-flame text-sm font-bold text-white disabled:opacity-40"
+              >
+                <Star className="h-4 w-4 fill-white" /> Attribuer
+              </button>
+            </div>
+          </Card>
+        </section>
+
+        <section className="mt-8">
+
           <h2 className="mb-3 font-display text-lg font-black">
             📋 Demandes en attente
             {enAttente.length > 0 && (
