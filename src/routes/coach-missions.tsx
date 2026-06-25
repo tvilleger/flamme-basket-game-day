@@ -42,6 +42,12 @@ function CoachMissions() {
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editing, setEditing] = useState(false);
+  const [direct, setDirect] = useState<{ joueuseId: string; etoiles: number; motif: string }>({
+    joueuseId: "",
+    etoiles: 5,
+    motif: "",
+  });
+
 
   const missionsQ = useQuery({ queryKey: ["missions"], queryFn: fetchMissions });
   const inscQ = useQuery({ queryKey: ["missions-inscriptions"], queryFn: fetchInscriptions });
