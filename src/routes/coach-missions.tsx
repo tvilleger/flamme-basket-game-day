@@ -126,6 +126,29 @@ function CoachMissions() {
     },
   });
 
+  const awardDirect = useMutation({
+    mutationFn: async () => {
+      if (!direct.joueuseId) throw new Error("Choisis une joueuse");
+      const nb = Number(direct.etoiles);
+      if (!nb || nb < 1) throw new Error("Nombre d'étoiles invalide");
+      const { error } = await supabase.from("etoiles_joueuses").insert({
+        joueuse_id: direct.joueuseId,
+        etoiles: nb,
+        motif: direct.motif.trim() || "Attribution directe",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(`+${direct.etoiles} ⭐ attribuée`);
+      setDirect({ joueuseId: "", etoiles: 5, motif: "" });
+      qc.invalidateQueries({ queryKey: ["etoiles-total"] });
+      qc.invalidateQueries({ queryKey: ["ranking-stars"] });
+      qc.invalidateQueries({ queryKey: ["coach-dashboard"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   if (!coach) return null;
 
   const missions = missionsQ.data ?? [];
