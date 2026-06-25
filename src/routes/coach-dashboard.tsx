@@ -147,6 +147,32 @@ function CoachDashboard() {
         }
       }
 
+      const missions = missionsRes.data ?? [];
+      const inscriptions = inscRes.data ?? [];
+      const etoiles = etoilesRes.data ?? [];
+
+      const missionsTotal = missions.filter((m) => !m.archivee).length;
+      const missionsRealisees = inscriptions.filter(
+        (i) => i.statut === "validee" || i.statut === "terminee",
+      ).length;
+      const missionsEnAttente = inscriptions.filter((i) => i.statut === "en_attente").length;
+      const etoilesDistribuees = etoiles.reduce((s, e) => s + (e.etoiles ?? 0), 0);
+
+      const etoilesByJoueuse = new Map<string, number>();
+      etoiles.forEach((e) => {
+        etoilesByJoueuse.set(e.joueuse_id, (etoilesByJoueuse.get(e.joueuse_id) ?? 0) + (e.etoiles ?? 0));
+      });
+      const topJoueuses = joueuses
+        .map((j) => ({
+          id: j.id,
+          prenom: j.prenom,
+          photo: j.photo,
+          etoiles: etoilesByJoueuse.get(j.id) ?? 0,
+        }))
+        .filter((j) => j.etoiles > 0)
+        .sort((a, b) => b.etoiles - a.etoiles)
+        .slice(0, 10);
+
       return {
         effectif,
         actives,
@@ -158,6 +184,11 @@ function CoachDashboard() {
         nextEntr,
         nextMatch,
         alerts,
+        missionsTotal,
+        missionsRealisees,
+        missionsEnAttente,
+        etoilesDistribuees,
+        topJoueuses,
       };
     },
   });
