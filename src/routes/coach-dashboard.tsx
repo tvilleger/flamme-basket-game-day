@@ -312,12 +312,63 @@ function CoachDashboard() {
         </div>
 
         <div className="mt-8">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg">⭐</span>
+            <h2 className="font-display text-lg font-black">Statistiques Missions</h2>
+            {data && data.missionsEnAttente > 0 && (
+              <Link
+                to="/coach-missions"
+                className="ml-auto rounded-full bg-flame px-2.5 py-0.5 text-xs font-bold text-white"
+              >
+                {data.missionsEnAttente} en attente
+              </Link>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <StatCard label="Missions actives" value={data?.missionsTotal ?? "—"} />
+            <StatCard label="Missions réalisées" value={data?.missionsRealisees ?? "—"} />
+            <StatCard label="En attente" value={data?.missionsEnAttente ?? "—"} accent />
+            <StatCard label="Étoiles distribuées" value={data?.etoilesDistribuees ?? "—"} suffix=" ⭐" />
+          </div>
+
+          {data && data.topJoueuses.length > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-white/60">
+                🏆 Top 10 joueuses engagées
+              </p>
+              <Card className="border border-white/10 bg-white/5 p-2">
+                {data.topJoueuses.map((j, i) => (
+                  <div
+                    key={j.id}
+                    className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5"
+                  >
+                    <span className="w-5 text-center font-display text-sm font-black text-flame">
+                      {i + 1}
+                    </span>
+                    <img
+                      src={getAvatar(j.prenom, j.photo)}
+                      alt={j.prenom}
+                      className="h-8 w-8 rounded-full object-cover ring-1 ring-white/10"
+                    />
+                    <p className="flex-1 truncate text-sm font-bold text-white">{j.prenom}</p>
+                    <span className="shrink-0 rounded-full bg-gradient-flame px-2.5 py-0.5 text-xs font-black text-white">
+                      {j.etoiles} ⭐
+                    </span>
+                  </div>
+                ))}
+              </Card>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-8">
           <h2 className="mb-3 font-display text-lg font-black">Actions rapides</h2>
           <div className="grid grid-cols-2 gap-3">
             <ActionButton to="/coach-messages" emoji="📢" label="Messages" />
             <ActionButton to="/coach-presences" emoji="✅" label="Présences" />
             <ActionButton to="/coach-flammes" emoji="🔥" label="Flammes" />
             <ActionButton to="/coach-effectif" emoji="👥" label="Effectif" />
+            <ActionButton to="/coach-missions" emoji="🏆" label="Missions" />
             <ActionButton to="/coach-matchs" emoji="🏀" label="Matchs" />
             <ActionButton to="/coach-entrainements" emoji="📅" label="Entraînements" />
             <ActionButton to="/coach-exports" emoji="📂" label="Exports" />
