@@ -154,9 +154,10 @@ function HomePage() {
           </div>
         </div>
 
-        <div className="relative mt-5 grid grid-cols-2 gap-3">
+        <div className="relative mt-5 grid grid-cols-3 gap-2">
           <Stat icon={<Flame size={18} animate={false} />} label="Flamme" value={`${player.flamme_actuelle}j`} tone="flame" />
           <Stat icon={<TrendingUp size={18} />} label="Record" value={`${player.record_flamme}j`} tone="dark" />
+          <Stat icon={<Star size={18} />} label="Étoiles" value={`${etoilesQ.data ?? 0}`} tone="dark" />
         </div>
       </section>
 
