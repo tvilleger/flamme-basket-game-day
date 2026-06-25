@@ -60,7 +60,9 @@ function CoachDashboard() {
           fetchNextMatch(),
           supabase.from("missions").select("id, archivee"),
           supabase.from("missions_inscriptions").select("statut, joueuse_id"),
-          supabase.from("etoiles_joueuses").select("joueuse_id, etoiles"),
+          supabase
+  .from("etoiles_joueuses")
+  .select("joueuse_id, total_etoiles"),
         ]);
 
       const joueuses = joueusesRes.data ?? [];
@@ -156,11 +158,17 @@ function CoachDashboard() {
         (i) => i.statut === "validee" || i.statut === "terminee",
       ).length;
       const missionsEnAttente = inscriptions.filter((i) => i.statut === "en_attente").length;
-      const etoilesDistribuees = etoiles.reduce((s, e) => s + (e.etoiles ?? 0), 0);
+     const etoilesDistribuees = etoiles.reduce(
+  (s, e) => s + (e.total_etoiles ?? 0),
+  0
+);
 
       const etoilesByJoueuse = new Map<string, number>();
       etoiles.forEach((e) => {
-        etoilesByJoueuse.set(e.joueuse_id, (etoilesByJoueuse.get(e.joueuse_id) ?? 0) + (e.etoiles ?? 0));
+     etoilesByJoueuse.set(
+  e.joueuse_id,
+  e.total_etoiles ?? 0
+);
       });
       const topJoueuses = joueuses
         .map((j) => ({
