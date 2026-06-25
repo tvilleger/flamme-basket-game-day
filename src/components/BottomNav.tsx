@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, ClipboardCheck, Trophy, Newspaper } from "lucide-react";
+import { Home, ClipboardCheck, Trophy, Newspaper, Star } from "lucide-react";
 
 const items = [
   { to: "/home", label: "Moi", icon: Home },
   { to: "/checkin", label: "Check-in", icon: ClipboardCheck },
+  { to: "/missions", label: "Missions", icon: Star },
   { to: "/rankings", label: "Classements", icon: Trophy },
   { to: "/feed", label: "Actu", icon: Newspaper },
 ] as const;
@@ -12,7 +13,7 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-lg pb-[env(safe-area-inset-bottom)]">
-      <ul className="mx-auto grid max-w-md grid-cols-4">
+      <ul className="mx-auto grid max-w-md grid-cols-5">
         {items.map(({ to, label, icon: Icon }) => {
           const active = pathname === to;
           return (
