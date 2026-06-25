@@ -56,13 +56,10 @@ export async function fetchMyInscriptions(joueuseId: string) {
 export async function fetchTotalEtoiles(joueuseId: string) {
   const { data, error } = await supabase
     .from("etoiles_joueuses")
-    .select("total_etoiles")
-    .eq("joueuse_id", joueuseId)
-    .single();
-
+    .select("etoiles")
+    .eq("joueuse_id", joueuseId);
   if (error) throw error;
-
-  return data?.total_etoiles ?? 0;
+  return (data ?? []).reduce((s, r) => s + (r.etoiles ?? 0), 0);
 }
 
 export async function inscrireMission(missionId: string, joueuseId: string) {

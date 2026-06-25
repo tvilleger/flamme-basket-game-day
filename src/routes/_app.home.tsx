@@ -14,7 +14,8 @@ import {
   getAvatar,
 } from "@/lib/api";
 import { fetchTotalEtoiles } from "@/lib/missions";
-import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera, Star } from "lucide-react";
+import { fetchPersonalBest } from "@/lib/shoot";
+import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera, Star, Target } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
@@ -42,6 +43,11 @@ function HomePage() {
   const etoilesQ = useQuery({
     queryKey: ["etoiles-total", session?.joueuseId],
     queryFn: () => fetchTotalEtoiles(session!.joueuseId),
+    enabled: !!session,
+  });
+  const shootBestQ = useQuery({
+    queryKey: ["shoot-best", session?.joueuseId],
+    queryFn: () => fetchPersonalBest(session!.joueuseId),
     enabled: !!session,
   });
 
@@ -170,6 +176,23 @@ function HomePage() {
           <p className="mt-2 text-3xl font-black">{player.flamme_actuelle}<span className="text-lg text-white/60">j</span></p>
           <p className="mt-1 text-xs text-white/60">consécutifs 🔥</p>
         </div>
+      </section>
+
+      <section className="mt-4">
+        <button
+          onClick={() => navigate({ to: "/shoot" })}
+          className="flex w-full items-center gap-4 rounded-3xl bg-gradient-ink p-4 text-left text-white shadow-card"
+        >
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-flame text-primary-foreground">
+            <Target size={22} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-primary">Shoot Challenge</p>
+            <p className="truncate text-base font-black">🏀 Record perso : {shootBestQ.data ?? 0} pts</p>
+            <p className="truncate text-xs text-white/60">60 secondes pour battre tout le monde</p>
+          </div>
+          <span className="rounded-full bg-gradient-flame px-3 py-1.5 text-xs font-black text-primary-foreground">JOUER</span>
+        </button>
       </section>
 
       <section className="mt-6">

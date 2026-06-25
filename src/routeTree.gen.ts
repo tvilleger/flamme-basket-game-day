@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as CoachShootRouteImport } from './routes/coach-shoot'
 import { Route as CoachPresencesRouteImport } from './routes/coach-presences'
 import { Route as CoachMissionsRouteImport } from './routes/coach-missions'
 import { Route as CoachMessagesRouteImport } from './routes/coach-messages'
@@ -21,12 +22,18 @@ import { Route as CoachEffectifRouteImport } from './routes/coach-effectif'
 import { Route as CoachDashboardRouteImport } from './routes/coach-dashboard'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppShootRouteImport } from './routes/_app.shoot'
 import { Route as AppRankingsRouteImport } from './routes/_app.rankings'
 import { Route as AppMissionsRouteImport } from './routes/_app.missions'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppFeedRouteImport } from './routes/_app.feed'
 import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
 
+const CoachShootRoute = CoachShootRouteImport.update({
+  id: '/coach-shoot',
+  path: '/coach-shoot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoachPresencesRoute = CoachPresencesRouteImport.update({
   id: '/coach-presences',
   path: '/coach-presences',
@@ -86,6 +93,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppShootRoute = AppShootRouteImport.update({
+  id: '/shoot',
+  path: '/shoot',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppRankingsRoute = AppRankingsRouteImport.update({
   id: '/rankings',
   path: '/rankings',
@@ -124,11 +136,13 @@ export interface FileRoutesByFullPath {
   '/coach-messages': typeof CoachMessagesRoute
   '/coach-missions': typeof CoachMissionsRoute
   '/coach-presences': typeof CoachPresencesRoute
+  '/coach-shoot': typeof CoachShootRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
   '/missions': typeof AppMissionsRoute
   '/rankings': typeof AppRankingsRoute
+  '/shoot': typeof AppShootRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,11 +156,13 @@ export interface FileRoutesByTo {
   '/coach-messages': typeof CoachMessagesRoute
   '/coach-missions': typeof CoachMissionsRoute
   '/coach-presences': typeof CoachPresencesRoute
+  '/coach-shoot': typeof CoachShootRoute
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
   '/missions': typeof AppMissionsRoute
   '/rankings': typeof AppRankingsRoute
+  '/shoot': typeof AppShootRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -162,11 +178,13 @@ export interface FileRoutesById {
   '/coach-messages': typeof CoachMessagesRoute
   '/coach-missions': typeof CoachMissionsRoute
   '/coach-presences': typeof CoachPresencesRoute
+  '/coach-shoot': typeof CoachShootRoute
   '/_app/checkin': typeof AppCheckinRoute
   '/_app/feed': typeof AppFeedRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/missions': typeof AppMissionsRoute
   '/_app/rankings': typeof AppRankingsRoute
+  '/_app/shoot': typeof AppShootRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -182,11 +200,13 @@ export interface FileRouteTypes {
     | '/coach-messages'
     | '/coach-missions'
     | '/coach-presences'
+    | '/coach-shoot'
     | '/checkin'
     | '/feed'
     | '/home'
     | '/missions'
     | '/rankings'
+    | '/shoot'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -200,11 +220,13 @@ export interface FileRouteTypes {
     | '/coach-messages'
     | '/coach-missions'
     | '/coach-presences'
+    | '/coach-shoot'
     | '/checkin'
     | '/feed'
     | '/home'
     | '/missions'
     | '/rankings'
+    | '/shoot'
   id:
     | '__root__'
     | '/'
@@ -219,11 +241,13 @@ export interface FileRouteTypes {
     | '/coach-messages'
     | '/coach-missions'
     | '/coach-presences'
+    | '/coach-shoot'
     | '/_app/checkin'
     | '/_app/feed'
     | '/_app/home'
     | '/_app/missions'
     | '/_app/rankings'
+    | '/_app/shoot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -239,10 +263,18 @@ export interface RootRouteChildren {
   CoachMessagesRoute: typeof CoachMessagesRoute
   CoachMissionsRoute: typeof CoachMissionsRoute
   CoachPresencesRoute: typeof CoachPresencesRoute
+  CoachShootRoute: typeof CoachShootRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/coach-shoot': {
+      id: '/coach-shoot'
+      path: '/coach-shoot'
+      fullPath: '/coach-shoot'
+      preLoaderRoute: typeof CoachShootRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/coach-presences': {
       id: '/coach-presences'
       path: '/coach-presences'
@@ -327,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/shoot': {
+      id: '/_app/shoot'
+      path: '/shoot'
+      fullPath: '/shoot'
+      preLoaderRoute: typeof AppShootRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/rankings': {
       id: '/_app/rankings'
       path: '/rankings'
@@ -371,6 +410,7 @@ interface AppRouteChildren {
   AppHomeRoute: typeof AppHomeRoute
   AppMissionsRoute: typeof AppMissionsRoute
   AppRankingsRoute: typeof AppRankingsRoute
+  AppShootRoute: typeof AppShootRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -379,6 +419,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppHomeRoute: AppHomeRoute,
   AppMissionsRoute: AppMissionsRoute,
   AppRankingsRoute: AppRankingsRoute,
+  AppShootRoute: AppShootRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -396,6 +437,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoachMessagesRoute: CoachMessagesRoute,
   CoachMissionsRoute: CoachMissionsRoute,
   CoachPresencesRoute: CoachPresencesRoute,
+  CoachShootRoute: CoachShootRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
