@@ -226,6 +226,87 @@ export type Database = {
         }
         Relationships: []
       }
+      messages_likes: {
+        Row: {
+          created_at: string
+          id: string
+          joueuse_id: string
+          message_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          joueuse_id: string
+          message_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          joueuse_id?: string
+          message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_likes_joueuse_id_fkey"
+            columns: ["joueuse_id"]
+            isOneToOne: false
+            referencedRelation: "joueuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_likes_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages_coach"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages_reponses: {
+        Row: {
+          auteur_nom: string
+          auteur_type: string
+          contenu: string
+          created_at: string
+          id: string
+          joueuse_id: string | null
+          message_id: string
+        }
+        Insert: {
+          auteur_nom: string
+          auteur_type?: string
+          contenu: string
+          created_at?: string
+          id?: string
+          joueuse_id?: string | null
+          message_id: string
+        }
+        Update: {
+          auteur_nom?: string
+          auteur_type?: string
+          contenu?: string
+          created_at?: string
+          id?: string
+          joueuse_id?: string | null
+          message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_reponses_joueuse_id_fkey"
+            columns: ["joueuse_id"]
+            isOneToOne: false
+            referencedRelation: "joueuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_reponses_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages_coach"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       missions: {
         Row: {
           archivee: boolean
