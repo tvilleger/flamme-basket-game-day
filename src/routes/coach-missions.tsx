@@ -250,6 +250,48 @@ function CoachMissions() {
         </Card>
 
         <section className="mt-8">
+          <h2 className="mb-3 font-display text-lg font-black">⭐ Attribuer des étoiles</h2>
+          <Card className="border border-white/10 bg-white/5 p-4">
+            <div className="grid gap-2">
+              <select
+                value={direct.joueuseId}
+                onChange={(e) => setDirect({ ...direct, joueuseId: e.target.value })}
+                className="rounded-xl border border-white/10 bg-ink px-3 py-2 text-sm text-white"
+              >
+                <option value="">— Choisir une joueuse —</option>
+                {(joueusesQ.data ?? []).map((j) => (
+                  <option key={j.id} value={j.id}>{j.prenom}</option>
+                ))}
+              </select>
+              <div className="grid grid-cols-[100px_1fr] gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  value={direct.etoiles}
+                  onChange={(e) => setDirect({ ...direct, etoiles: Number(e.target.value) })}
+                  className="rounded-xl border border-white/10 bg-ink px-3 py-2 text-sm text-white"
+                  aria-label="Nombre d'étoiles"
+                />
+                <input
+                  value={direct.motif}
+                  onChange={(e) => setDirect({ ...direct, motif: e.target.value })}
+                  placeholder="Motif (optionnel)"
+                  className="rounded-xl border border-white/10 bg-ink px-3 py-2 text-sm text-white"
+                />
+              </div>
+              <button
+                onClick={() => awardDirect.mutate()}
+                disabled={awardDirect.isPending || !direct.joueuseId}
+                className="mt-1 inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-flame text-sm font-bold text-white disabled:opacity-40"
+              >
+                <Star className="h-4 w-4 fill-white" /> Attribuer
+              </button>
+            </div>
+          </Card>
+        </section>
+
+        <section className="mt-8">
+
           <h2 className="mb-3 font-display text-lg font-black">
             📋 Demandes en attente
             {enAttente.length > 0 && (
