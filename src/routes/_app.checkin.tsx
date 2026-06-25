@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Star } from "lucide-react";
+import { toast } from "sonner";
 import { fetchNextEntrainement, formatFrDate, submitCheckin } from "@/lib/api";
 import { getSession } from "@/lib/session";
+import { getOrCreateAutoMission, inscrireMission, fetchMissionTakenCount } from "@/lib/missions";
 
 export const Route = createFileRoute("/_app/checkin")({
   component: CheckinPage,
