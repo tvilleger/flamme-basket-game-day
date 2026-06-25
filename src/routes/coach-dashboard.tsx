@@ -48,7 +48,7 @@ function CoachDashboard() {
     enabled: !!coach,
     queryKey: ["coach-dashboard-v2"],
     queryFn: async () => {
-      const [joueusesRes, presEntrRes, presMatchRes, entrRes, nextEntr, nextMatch] =
+      const [joueusesRes, presEntrRes, presMatchRes, entrRes, nextEntr, nextMatch, missionsRes, inscRes, etoilesRes] =
         await Promise.all([
           supabase.from("joueuses").select("*"),
           supabase
@@ -58,6 +58,9 @@ function CoachDashboard() {
           supabase.from("entrainements").select("id, date").order("date", { ascending: true }),
           fetchNextEntrainement(),
           fetchNextMatch(),
+          supabase.from("missions").select("id, archivee"),
+          supabase.from("missions_inscriptions").select("statut, joueuse_id"),
+          supabase.from("etoiles_joueuses").select("joueuse_id, etoiles"),
         ]);
 
       const joueuses = joueusesRes.data ?? [];
