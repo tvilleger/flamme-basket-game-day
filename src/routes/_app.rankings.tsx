@@ -117,6 +117,8 @@ function RankingsPage() {
         />
       ) : tab === "training" ? (
         <RankingList items={trainingQ.data ?? []} suffix="%" />
+      ) : tab === "stars" ? (
+        <RankingList items={starsQ.data ?? []} suffix=" ⭐" />
       ) : (
         <RankingList items={matchQ.data ?? []} suffix="%" />
       )}
