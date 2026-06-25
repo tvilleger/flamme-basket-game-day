@@ -43,26 +43,30 @@ async function fetchAttendanceRanking(kind: "training" | "match") {
 }
 
 async function fetchStarsRanking() {
-  const [{ data: joueuses }, { data: etoiles }, { data: inscriptions }] = await Promise.all([
+  const [{ data: joueuses }, { data: etoiles }] = await Promise.all([
     supabase.from("joueuses").select("*"),
-    supabase.from("etoiles_joueuses").select("joueuse_id, etoiles"),
-    supabase.from("missions_inscriptions").select("joueuse_id, statut"),
+    supabase
+      .from("etoiles_joueuses")
+      .select("joueuse_id, total_etoiles, missions_validees"),
   ]);
-  const totals = new Map<string, number>();
-  (etoiles ?? []).forEach((e) => {
-    totals.set(e.joueuse_id, (totals.get(e.joueuse_id) ?? 0) + (e.etoiles ?? 0));
-  });
-  const validated = new Map<string, number>();
-  (inscriptions ?? [])
-    .filter((i) => i.statut === "validee" || i.statut === "terminee")
-    .forEach((i) => validated.set(i.joueuse_id, (validated.get(i.joueuse_id) ?? 0) + 1));
+
   return (joueuses ?? [])
-    .map((j) => ({
-      joueuse: j as Joueuse,
-      value: totals.get(j.id) ?? 0,
-      missions: validated.get(j.id) ?? 0,
-    }))
-    .sort((a, b) => b.value - a.value || b.missions - a.missions);
+    .map((j) => {
+      const stats = (etoiles ?? []).find(
+        (e) => e.joueuse_id === j.id
+      );
+
+      return {
+        joueuse: j as Joueuse,
+        value: stats?.total_etoiles ?? 0,
+        missions: stats?.missions_validees ?? 0,
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.value - a.value ||
+        b.missions - a.missions
+    );
 }
 
 function RankingsPage() {
