@@ -21,6 +21,7 @@ import { Route as CoachDashboardRouteImport } from './routes/coach-dashboard'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRankingsRouteImport } from './routes/_app.rankings'
+import { Route as AppMissionsRouteImport } from './routes/_app.missions'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppFeedRouteImport } from './routes/_app.feed'
 import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
@@ -84,6 +85,11 @@ const AppRankingsRoute = AppRankingsRouteImport.update({
   path: '/rankings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMissionsRoute = AppMissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
+  '/missions': typeof AppMissionsRoute
   '/rankings': typeof AppRankingsRoute
 }
 export interface FileRoutesByTo {
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/checkin': typeof AppCheckinRoute
   '/feed': typeof AppFeedRoute
   '/home': typeof AppHomeRoute
+  '/missions': typeof AppMissionsRoute
   '/rankings': typeof AppRankingsRoute
 }
 export interface FileRoutesById {
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_app/checkin': typeof AppCheckinRoute
   '/_app/feed': typeof AppFeedRoute
   '/_app/home': typeof AppHomeRoute
+  '/_app/missions': typeof AppMissionsRoute
   '/_app/rankings': typeof AppRankingsRoute
 }
 export interface FileRouteTypes {
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/feed'
     | '/home'
+    | '/missions'
     | '/rankings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/feed'
     | '/home'
+    | '/missions'
     | '/rankings'
   id:
     | '__root__'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_app/checkin'
     | '/_app/feed'
     | '/_app/home'
+    | '/_app/missions'
     | '/_app/rankings'
   fileRoutesById: FileRoutesById
 }
@@ -302,6 +314,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRankingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/missions': {
+      id: '/_app/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof AppMissionsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/home': {
       id: '/_app/home'
       path: '/home'
@@ -330,6 +349,7 @@ interface AppRouteChildren {
   AppCheckinRoute: typeof AppCheckinRoute
   AppFeedRoute: typeof AppFeedRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppMissionsRoute: typeof AppMissionsRoute
   AppRankingsRoute: typeof AppRankingsRoute
 }
 
@@ -337,6 +357,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCheckinRoute: AppCheckinRoute,
   AppFeedRoute: AppFeedRoute,
   AppHomeRoute: AppHomeRoute,
+  AppMissionsRoute: AppMissionsRoute,
   AppRankingsRoute: AppRankingsRoute,
 }
 
