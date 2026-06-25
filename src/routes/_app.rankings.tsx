@@ -10,12 +10,13 @@ export const Route = createFileRoute("/_app/rankings")({
   component: RankingsPage,
 });
 
-type Tab = "training" | "match" | "flame" | "hof";
+type Tab = "training" | "match" | "flame" | "stars" | "hof";
 
 const tabs: { id: Tab; label: string }[] = [
+  { id: "flame", label: "Flammes" },
+  { id: "stars", label: "Étoiles" },
   { id: "training", label: "Entraîn." },
   { id: "match", label: "Matchs" },
-  { id: "flame", label: "Flammes" },
   { id: "hof", label: "Hall of Fame" },
 ];
 
