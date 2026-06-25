@@ -114,6 +114,9 @@ function CoachMissions() {
     onSuccess: () => {
       toast.success("Inscription validée — étoiles attribuées ⭐");
       qc.invalidateQueries({ queryKey: ["missions-inscriptions"] });
+      qc.invalidateQueries({ queryKey: ["etoiles-total"] });
+      qc.invalidateQueries({ queryKey: ["ranking-stars"] });
+      qc.invalidateQueries({ queryKey: ["coach-dashboard-v2"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -143,7 +146,7 @@ function CoachMissions() {
       setDirect({ joueuseId: "", etoiles: 5, motif: "" });
       qc.invalidateQueries({ queryKey: ["etoiles-total"] });
       qc.invalidateQueries({ queryKey: ["ranking-stars"] });
-      qc.invalidateQueries({ queryKey: ["coach-dashboard"] });
+      qc.invalidateQueries({ queryKey: ["coach-dashboard-v2"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
