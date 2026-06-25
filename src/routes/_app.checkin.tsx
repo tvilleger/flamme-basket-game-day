@@ -47,6 +47,14 @@ function CheckinPage() {
         </div>
         <h1 className="mt-6 text-3xl font-black">Check-in validé !</h1>
         <p className="mt-2 text-muted-foreground">Ta réponse a été enregistrée 🔥</p>
+
+        {presence === "yes" && trainingQ.data && (
+          <AutoMissionCard
+            entrainementDate={trainingQ.data.date}
+            joueuseId={session!.joueuseId}
+          />
+        )}
+
         <button
           onClick={() => { setDone(false); setPresence(null); setFatigue(0); }}
           className="mt-8 rounded-2xl bg-secondary px-6 py-3 font-bold text-secondary-foreground"
