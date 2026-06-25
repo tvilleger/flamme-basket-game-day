@@ -13,7 +13,8 @@ import {
   formatFrDate,
   getAvatar,
 } from "@/lib/api";
-import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera } from "lucide-react";
+import { fetchTotalEtoiles } from "@/lib/missions";
+import { Calendar, Swords, LogOut, TrendingUp, Activity, Camera, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
   component: HomePage,
