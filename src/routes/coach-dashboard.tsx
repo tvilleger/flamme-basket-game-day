@@ -10,7 +10,8 @@ import {
 } from "@/lib/api";
 import { Card } from "@/components/ui/card";
 import { Flame } from "@/components/Flame";
-import { AlertTriangle, BedDouble, Stethoscope, UserX } from "lucide-react";
+import { AlertTriangle, BedDouble, Stethoscope, UserX, Target } from "lucide-react";
+import { fetchPersonalBest } from "@/lib/shoot";
 
 export const Route = createFileRoute("/coach-dashboard")({
   component: CoachDashboard,
@@ -44,6 +45,12 @@ function CoachDashboard() {
     }
   }, [navigate]);
 
+  const shootBestQ = useQuery({
+    enabled: !!coach,
+    queryKey: ["coach-shoot-best", coach?.id],
+    queryFn: () => fetchPersonalBest(coach!.id),
+  });
+
   const { data } = useQuery({
     enabled: !!coach,
     queryKey: ["coach-dashboard-v2"],
@@ -62,7 +69,7 @@ function CoachDashboard() {
           supabase.from("missions_inscriptions").select("statut, joueuse_id"),
           supabase
   .from("etoiles_joueuses")
-  .select("joueuse_id, total_etoiles"),
+  .select("joueuse_id, etoiles"),
         ]);
 
       const joueuses = joueusesRes.data ?? [];
@@ -159,7 +166,7 @@ function CoachDashboard() {
       ).length;
       const missionsEnAttente = inscriptions.filter((i) => i.statut === "en_attente").length;
      const etoilesDistribuees = etoiles.reduce(
-  (s, e) => s + (e.total_etoiles ?? 0),
+  (s, e) => s + (e.etoiles ?? 0),
   0
 );
 
@@ -167,7 +174,7 @@ function CoachDashboard() {
       etoiles.forEach((e) => {
      etoilesByJoueuse.set(
   e.joueuse_id,
-  e.total_etoiles ?? 0
+  (etoilesByJoueuse.get(e.joueuse_id) ?? 0) + (e.etoiles ?? 0)
 );
       });
       const topJoueuses = joueuses
@@ -289,7 +296,23 @@ function CoachDashboard() {
               <p className="mt-2 text-sm text-white/60">Aucun match planifié</p>
             )}
           </Card>
+
+          <Link
+            to="/coach-shoot"
+            className="flex items-center gap-4 rounded-2xl border border-flame/40 bg-black/30 p-4 shadow-card backdrop-blur"
+          >
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-flame to-orange-600">
+              <Target className="h-5 w-5 text-white" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-flame">Shoot Challenge</p>
+              <p className="truncate text-base font-black">🏀 Ton record : {shootBestQ.data ?? 0} pts</p>
+              <p className="truncate text-xs text-white/60">Affronte les joueuses dans le mini-jeu</p>
+            </div>
+            <span className="rounded-full bg-flame px-3 py-1.5 text-xs font-black text-white">JOUER</span>
+          </Link>
         </div>
+
 
         <div className="mt-8">
           <div className="mb-3 flex items-center gap-2">

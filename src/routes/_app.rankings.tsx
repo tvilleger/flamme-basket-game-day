@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchJoueuses, getAvatar, type Joueuse } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchShootLeaderboard } from "@/lib/shoot";
 import { Flame } from "@/components/Flame";
 import { Trophy, Medal } from "lucide-react";
 
@@ -10,15 +11,17 @@ export const Route = createFileRoute("/_app/rankings")({
   component: RankingsPage,
 });
 
-type Tab = "training" | "match" | "flame" | "stars" | "hof";
+type Tab = "training" | "match" | "flame" | "stars" | "shoot" | "hof";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "flame", label: "Flammes" },
   { id: "stars", label: "Étoiles" },
+  { id: "shoot", label: "🏀 Shoot" },
   { id: "training", label: "Entraîn." },
   { id: "match", label: "Matchs" },
   { id: "hof", label: "Hall of Fame" },
 ];
+
 
 async function fetchAttendanceRanking(kind: "training" | "match") {
   const table = kind === "training" ? "presences_entrainements" : "presences_matchs";
@@ -47,26 +50,18 @@ async function fetchStarsRanking() {
     supabase.from("joueuses").select("*"),
     supabase
       .from("etoiles_joueuses")
-      .select("joueuse_id, total_etoiles, missions_validees"),
+      .select("joueuse_id, etoiles, mission_id"),
   ]);
 
+  const rows = etoiles ?? [];
   return (joueuses ?? [])
     .map((j) => {
-      const stats = (etoiles ?? []).find(
-        (e) => e.joueuse_id === j.id
-      );
-
-      return {
-        joueuse: j as Joueuse,
-        value: stats?.total_etoiles ?? 0,
-        missions: stats?.missions_validees ?? 0,
-      };
+      const mine = rows.filter((e) => e.joueuse_id === j.id);
+      const total = mine.reduce((s, e) => s + (e.etoiles ?? 0), 0);
+      const missions = mine.filter((e) => e.mission_id !== null).length;
+      return { joueuse: j as Joueuse, value: total, missions };
     })
-    .sort(
-      (a, b) =>
-        b.value - a.value ||
-        b.missions - a.missions
-    );
+    .sort((a, b) => b.value - a.value || b.missions - a.missions);
 }
 
 function RankingsPage() {
@@ -87,6 +82,11 @@ function RankingsPage() {
     queryKey: ["ranking-stars"],
     queryFn: fetchStarsRanking,
     enabled: tab === "stars",
+  });
+  const shootQ = useQuery({
+    queryKey: ["ranking-shoot"],
+    queryFn: fetchShootLeaderboard,
+    enabled: tab === "shoot",
   });
 
   return (
@@ -123,12 +123,51 @@ function RankingsPage() {
         <RankingList items={trainingQ.data ?? []} suffix="%" />
       ) : tab === "stars" ? (
         <RankingList items={starsQ.data ?? []} suffix=" ⭐" />
+      ) : tab === "shoot" ? (
+        <ShootRanking data={shootQ.data ?? []} />
       ) : (
         <RankingList items={matchQ.data ?? []} suffix="%" />
       )}
     </div>
   );
 }
+
+function ShootRanking({ data }: { data: { utilisateur_id: string; utilisateur_type: "joueuse" | "coach"; nom: string; best: number }[] }) {
+  if (!data.length) {
+    return <p className="mt-8 text-center text-sm text-muted-foreground">Pas encore de partie jouée.</p>;
+  }
+  return (
+    <section className="mt-5 space-y-2">
+      {data.map((row, i) => (
+        <div
+          key={row.utilisateur_id}
+          className={`flex items-center gap-3 rounded-2xl p-3 shadow-card ${
+            i === 0 ? "bg-gradient-ink text-white" : "bg-card"
+          }`}
+        >
+          <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-black ${
+            i === 0 ? "bg-yellow-400 text-black" :
+            i === 1 ? "bg-zinc-300 text-black" :
+            i === 2 ? "bg-amber-700 text-white" :
+            "bg-muted text-muted-foreground"
+          }`}>{i + 1}</span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black">
+              {row.nom}
+              {row.utilisateur_type === "coach" && (
+                <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-black text-secondary-foreground">COACH</span>
+              )}
+            </p>
+          </div>
+          <span className="rounded-full bg-gradient-flame px-3 py-1.5 text-sm font-black text-primary-foreground">
+            {row.best}
+          </span>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 
 function RankingList({
   items, suffix,

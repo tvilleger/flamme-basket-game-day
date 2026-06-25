@@ -400,6 +400,33 @@ export type Database = {
           },
         ]
       }
+      shoot_scores: {
+        Row: {
+          date_partie: string
+          id: string
+          nom: string
+          score: number
+          utilisateur_id: string
+          utilisateur_type: string
+        }
+        Insert: {
+          date_partie?: string
+          id?: string
+          nom: string
+          score: number
+          utilisateur_id: string
+          utilisateur_type: string
+        }
+        Update: {
+          date_partie?: string
+          id?: string
+          nom?: string
+          score?: number
+          utilisateur_id?: string
+          utilisateur_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
